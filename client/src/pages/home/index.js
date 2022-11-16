@@ -66,7 +66,7 @@ export default function Home() {
         </div>
       </div>
 
-      <a className="scroll-to-top rounded" href="#page-top">
+      <a className="scroll-to-top rounded" >
         <i className="fas fa-angle-up"></i>
       </a>
 
@@ -105,9 +105,9 @@ export default function Home() {
               >
                 Cancel
               </button>
-              <a className="btn btn-primary" href="login.html">
+              <button className="btn btn-primary" >
                 Logout
-              </a>
+              </button>
             </div>
           </div>
         </div>

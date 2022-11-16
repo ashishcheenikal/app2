@@ -59,12 +59,12 @@ export default function Login() {
                                     </div>
                                     <div className="form-group">
                                         <input type="password" className="form-control form-control-user"
-                                            id="exampleInputPassword" placeholder="Password" name="password" onChange={handleChange}/>
+                                            id="exampleInputPassword" placeholder="Password" name="password" autoComplete="off" onChange={handleChange}/>
                                     </div>
                                     <div className="form-group">
                                         <div className="custom-control custom-checkbox small">
                                             <input type="checkbox" className="custom-control-input" id="customCheck"/>
-                                            <label className="custom-control-label" for="customCheck">Remember
+                                            <label className="custom-control-label" htmlFor="customCheck">Remember
                                                 Me</label>
                                         </div>
                                     </div>

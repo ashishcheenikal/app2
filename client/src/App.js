@@ -3,15 +3,23 @@ import "./App.css";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import NotLoggedIn from "./routes/NotLoggedIn";
+import LoggedIn from "./routes/LoggedIn";
 
 function App() {
-  return <div>
-    <Routes>
-        <Route path="/" element={<Home />} exact/>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-    </Routes>
-  </div>;
+  return (
+    <div>
+      <Routes>
+        <Route element={<LoggedIn/>}>
+          <Route path="/" element={<Home />} />
+        </Route>
+        <Route element={<NotLoggedIn />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+      </Routes>
+    </div>
+  );
 }
 
 export default App;

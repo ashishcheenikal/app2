@@ -90,6 +90,7 @@ export default function Register() {
                         id="exampleInputPassword"
                         name="password"
                         placeholder="Password"
+                        autoComplete="off"
                         onChange={handleChange}
                       />
                     </div>
@@ -100,6 +101,7 @@ export default function Register() {
                         id="exampleRepeatPassword"
                         name="confirmPassword"
                         placeholder="Repeat Password"
+                        autoComplete="off"
                         onChange={handleChange}
                       />
                     </div>
