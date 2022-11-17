@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -7,6 +7,7 @@ import axios from "axios";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState({ email: "" });
+  const navigate = useNavigate()
 
   const resetSchema = yup.object().shape({
     email: yup.string().required().email("Enter valid email address"),
@@ -31,6 +32,7 @@ export default function ForgetPassword() {
     const res =await resetPassword();
     if(res.success) {
         alert(res.message)
+        navigate("/newPassword")
     }
     else {
         alert(res.message)
