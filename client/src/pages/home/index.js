@@ -1,9 +1,15 @@
 import { useEffect } from "react";
+import {  useNavigate } from "react-router-dom";
 
 export default function Home() {
-  useEffect(()=>{
+  const navigate = useNavigate();
+  useEffect(() => {
     console.log(sessionStorage.getItem("userData"));
-  },[])
+  }, []);
+  const handleLogout = () => {
+    sessionStorage.removeItem("userData");
+    navigate("/login");
+  };
   return (
     <div>
       <div id="wrapper">
@@ -12,7 +18,7 @@ export default function Home() {
             <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
               <ul className="navbar-nav ml-auto">
                 <li className="nav-item dropdown no-arrow">
-                  <a
+                  <button
                     className="nav-link dropdown-toggle"
                     id="userDropdown"
                     role="button"
@@ -28,32 +34,32 @@ export default function Home() {
                       src="img/undraw_profile.svg"
                       alt="img"
                     />
-                  </a>
+                  </button>
                   <div
                     className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                     aria-labelledby="userDropdown"
                   >
-                    <a className="dropdown-item">
+                    <button className="dropdown-item">
                       <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                       Profile
-                    </a>
-                    <a className="dropdown-item">
+                    </button>
+                    <button className="dropdown-item">
                       <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                       Settings
-                    </a>
-                    <a className="dropdown-item">
+                    </button>
+                    <button className="dropdown-item">
                       <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
                       Activity Log
-                    </a>
+                    </button>
                     <div className="dropdown-divider"></div>
-                    <a
+                    <button
                       className="dropdown-item"
                       data-toggle="modal"
                       data-target="#logoutModal"
                     >
                       <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                       Logout
-                    </a>
+                    </button>
                   </div>
                 </li>
               </ul>
@@ -66,9 +72,9 @@ export default function Home() {
         </div>
       </div>
 
-      <a className="scroll-to-top rounded" >
+      <button className="scroll-to-top rounded">
         <i className="fas fa-angle-up"></i>
-      </a>
+      </button>
 
       <div
         className="modal fade"
@@ -105,7 +111,7 @@ export default function Home() {
               >
                 Cancel
               </button>
-              <button className="btn btn-primary" >
+              <button className="btn btn-primary" onClick={handleLogout}>
                 Logout
               </button>
             </div>
