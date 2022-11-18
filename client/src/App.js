@@ -7,6 +7,8 @@ import NotLoggedIn from "./routes/NotLoggedIn";
 import LoggedIn from "./routes/LoggedIn";
 import ForgetPassword from "./pages/ForgetPassword";
 import NewPassword from "./pages/ForgetPassword/NewPassword";
+import AdLogin from "./AdminPages/AdLogin";
+import AdHome from "./AdminPages/AdHome";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route path="/forgetPassword" element={<ForgetPassword />} />
           <Route path="/newPassword/:id/:token" element={<NewPassword />} />
         </Route>
+        <Route path="/admin/" element={<AdHome />} />
+        <Route path="/admin/login" element={<AdLogin />} />
       </Routes>
     </div>
   );

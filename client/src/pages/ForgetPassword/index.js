@@ -32,7 +32,7 @@ export default function ForgetPassword() {
     const res =await resetPassword();
     if(res.success) {
         alert(res.message)
-        navigate("/newPassword")
+        navigate("/login")
     }
     else {
         alert(res.message)
