@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
 const userRouter= require("./routes/users") 
+const adminRouter= require("./routes/admin") 
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/',userRouter)
+app.use('/admin',adminRouter) 
 
 mongoose
   .connect(process.env.DATABASE_URL, {

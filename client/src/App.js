@@ -1,31 +1,27 @@
-import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import Home from "./pages/home";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import NotLoggedIn from "./routes/NotLoggedIn";
-import LoggedIn from "./routes/LoggedIn";
-import ForgetPassword from "./pages/ForgetPassword";
-import NewPassword from "./pages/ForgetPassword/NewPassword";
-import AdLogin from "./AdminPages/AdLogin";
-import AdHome from "./AdminPages/AdHome";
+import AdminRoutes from "./routes/AdminRoutes/AdminRoutes";
+// import { Route, Routes } from "react-router-dom";
+// import Home from "./pages/home";
+// import Login from "./pages/login";
+// import Register from "./pages/register";
+// import NotLoggedIn from "./routes/UserRoutes/NotLoggedIn";
+// import LoggedIn from "./routes/UserRoutes/LoggedIn";
+// import ForgetPassword from "./pages/ForgetPassword";
+// import NewPassword from "./pages/ForgetPassword/NewPassword";
+// import AdLogin from "./AdminPages/AdLogin";
+// import AdHome from "./AdminPages/AdHome";
+import UserRoutes from "./routes/UserRoutes/userRoutes";
 
 function App() {
   return (
     <div>
-      <Routes>
-        <Route element={<LoggedIn/>}>
-          <Route path="/" element={<Home />} />
-        </Route>
-        <Route element={<NotLoggedIn />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgetPassword" element={<ForgetPassword />} />
-          <Route path="/newPassword/:id/:token" element={<NewPassword />} />
-        </Route>
-        <Route path="/admin/" element={<AdHome />} />
-        <Route path="/admin/login" element={<AdLogin />} />
-      </Routes>
+      <AdminRoutes />
+      <UserRoutes />
+      {/* <Routes> */}
+        {/* <Route element={<UserRoutes />} /> */}
+        {/* <Route path="/admin/" element={<AdHome />} />
+        <Route path="/admin/login" element={<AdLogin />} /> */}
+      {/* </Routes> */}
     </div>
   );
 }

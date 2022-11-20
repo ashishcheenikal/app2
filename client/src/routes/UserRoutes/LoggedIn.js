@@ -1,6 +1,5 @@
 import React from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import Login from '../pages/login'
 
 export default function LoggedIn() {
     const user = sessionStorage.getItem("userData")
