@@ -1,10 +1,9 @@
-import "./table.css";
 
 export default function Table() {
   return (
     <div>
       <div className="btnWrap">
-        <div className="AddMeeting mb-4">
+        <div className="AddMeeting mb-3 mr-3" style={{textAlign:"end"}}>
           <button className="btn btn-primary p-2 shadow meet">
             Add New Meeting
           </button>
