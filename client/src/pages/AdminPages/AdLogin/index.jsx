@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "./formSchema";
@@ -46,8 +46,8 @@ export default function AdLogin() {
     let check = await login();
     console.log(check, "check");
     if (check.success) {
-      sessionStorage.setItem("userData", JSON.stringify(check.data.token));
-      navigate("/");
+      sessionStorage.setItem("adminData", JSON.stringify(check.data.token));
+      navigate("/admin/");
     } else {
       alert(check.message);
     }
@@ -64,7 +64,7 @@ export default function AdLogin() {
                   <div className="col-lg-6">
                     <div className="p-5">
                       <div className="text-center">
-                        <h1 className="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                        <h1 className="h4 text-gray-900 mb-4">Welcome Back Admin!</h1>
                       </div>
                       <form className="user" onSubmit={handleSubmit(SubmitHandler)}>
                         <div className="form-group">
@@ -122,14 +122,14 @@ export default function AdLogin() {
                         </button>
                         <hr />
                       </form>
-                      <div className="text-center">
+                      {/* <div className="text-center">
                         <Link className="small" to="/forgetPassword">Forgot Password?</Link>
                       </div>
                       <div className="text-center">
                         <Link className="small" to="/register">
                           Create an Account!
                         </Link>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>

@@ -15,8 +15,8 @@ import UserRoutes from "./routes/UserRoutes/userRoutes";
 function App() {
   return (
     <div>
-      <AdminRoutes />
       <UserRoutes />
+      <AdminRoutes />
       {/* <Routes> */}
         {/* <Route element={<UserRoutes />} /> */}
         {/* <Route path="/admin/" element={<AdHome />} />

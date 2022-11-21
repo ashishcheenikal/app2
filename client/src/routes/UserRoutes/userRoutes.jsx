@@ -7,6 +7,7 @@ import LoggedIn from "./LoggedIn";
 import ForgetPassword from "../../pages/ForgetPassword";
 import NewPassword from "../../pages/ForgetPassword/NewPassword";
 
+
 export default function UserRoutes() {
     return (
         <div>
