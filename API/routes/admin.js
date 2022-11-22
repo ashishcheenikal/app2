@@ -5,7 +5,7 @@ const validation = require("../middleware/validation");
 const loginSchema = require("../validation/loginValidation");
 
 router.post("/login", validation(loginSchema), adminController.login);
-router.post("/AllUsers", adminController.AllUsers);
+router.get("/AllUsers", adminController.AllUsers);
 router.post("/AddMeeting", adminController.AddMeeting);
 router.post("/GetAllMeeting", adminController.GetAllMeeting);
 

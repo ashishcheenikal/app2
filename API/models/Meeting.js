@@ -4,6 +4,10 @@ const slug = require("mongoose-slug-generator");
 
 const MeetingSchema = new mongoose.Schema(
   {
+    meetName: {
+      type: String,
+      required: true,
+    },
     host: [
       {
         type: ObjectId,
@@ -16,7 +20,7 @@ const MeetingSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    scheduledTime:{
+    scheduledTime: {
       type: Date,
       default: Date.now,
     },
