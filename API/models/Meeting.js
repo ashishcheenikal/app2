@@ -16,6 +16,15 @@ const MeetingSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    scheduledTime:{
+      type: Date,
+      default: Date.now,
+    },
+    status: {
+      type: String,
+      enum: ["Scheduled", "completed", "cancelled"],
+      default: "Scheduled",
+    },
     slug: {
       type: String,
       slug: "host",
@@ -33,5 +42,4 @@ const options = {
 };
 MeetingSchema.plugin(slug, options);
 
-module.exports = mongoose.model("Meeting",MeetingSchema)
-
+module.exports = mongoose.model("Meeting", MeetingSchema);

@@ -39,6 +39,27 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.AllUsers = async (req, res) => {
+  try {
+    console.log('AllUsers')
+    const AllUsers = await Users.find();
+    if (!AllUsers) {
+      return res.status(404).json({
+        success: false,
+        message: "Currently no users available",
+        data: {},
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "List of all users ",
+      data: AllUsers,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.AddMeeting = async (req, res) => {
   try {
     console.log("AddMeeting");
@@ -47,8 +68,8 @@ exports.AddMeeting = async (req, res) => {
       host,
       participants,
     });
-    res.status(200).json({
-      status: true,
+    return res.status(200).json({
+      success: true,
       message: "Meeting created successfully",
       data: meeting,
     });
@@ -61,8 +82,8 @@ exports.GetAllMeeting = async (req, res) => {
   try {
     console.log("GetAllMeeting");
     const allMeeting = await Meeting.find({});
-    res.status(200).json({
-      status: true,
+    return res.status(200).json({
+      success: true,
       message: "List of all meetings ",
       data: allMeeting,
     });
@@ -70,20 +91,55 @@ exports.GetAllMeeting = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.DetailMeeting = async (req, res) => {
   try {
+    console.log('DetailMeeting')
+    console.log(req.body.user)
+    const { id } = req.body.user;
+    const meeting = await Meeting.findById(id);
+    if (!meeting) {
+      return res.status(404).json({
+        success: false,
+        message: "Meeting not found",
+        data:{}
+      })
+    }
+    return res.status(200).json({
+      success:true,
+      message:"Details of Meeting",
+      data: meeting
+    })
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.EditMeeting = async (req, res) => {
   try {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.DeleteMeeting = async (req, res) => {
   try {
+    console.log('DeleteMeeting')
+    console.log(req.body.user)
+    const { id } = req.body.user;
+    const meeting = await Meeting.findById(id);
+    if (!meeting) {
+      return res.status(404).json({
+        success: false,
+        message: "Meeting not found",
+        data:{}
+      })
+    }
+    return res.status(200).json({
+      success:true,
+      message:"Details of Meeting",
+      data: meeting
+    })
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
