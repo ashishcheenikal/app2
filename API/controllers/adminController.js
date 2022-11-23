@@ -65,14 +65,12 @@ exports.AddMeeting = async (req, res) => {
     console.log("AddMeeting");
     console.log(req.body.user);
     const { meetName, host, participants, currentDate } = req.body.user;
-    console.log(typeof currentDate, "type");
     const meeting = await Meeting.create({
       meetName,
       host,
       participants,
       scheduledTime: currentDate,
     });
-    console.log(meeting);
     res.status(200).json({
       success: true,
       message: "Meeting created successfully",
@@ -124,6 +122,17 @@ exports.DetailMeeting = async (req, res) => {
 
 exports.EditMeeting = async (req, res) => {
   try {
+    console.log("EditMeeting")
+    const id = req.params.id;
+    console.log(id)
+    console.log(req.body.user);
+    const { meetName, host, participants, currentDate } = req.body.user;
+    const meeting = await Meeting.findByIdAndUpdate(id,{meetName, host, participants, scheduledTime: currentDate})
+    res.status(200).json({
+      success: true,
+      message: "Meeting Edited successfully",
+      data: meeting,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -9,7 +9,7 @@ router.get("/AllUsers", adminController.AllUsers);
 router.post("/AddMeeting", adminController.AddMeeting);
 router.get("/GetAllMeeting", adminController.GetAllMeeting);
 router.get("/DetailMeeting/:id", adminController.DetailMeeting);
-router.get("/EditMeeting/:id", adminController.EditMeeting);
+router.post("/EditMeeting/:id", adminController.EditMeeting);
 router.post("/CancelMeeting/:id", adminController.CancelMeeting);
 
 module.exports = router;

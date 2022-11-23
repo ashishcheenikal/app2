@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
+import moment from "moment";
 
 
 export default function EditForm({id}) {
@@ -41,12 +41,13 @@ export default function EditForm({id}) {
   const options = users.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   });
-  const defaultValue = meeting.host?.map((value)=>{
+  const valueHost = meeting.host?.map((value)=>{
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   })
-  {let result = Array.isArray(defaultValue)
-    console.log(defaultValue,"isArray")
-  }
+  const valueParticipants = meeting.participants?.map((value)=>{
+    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+  })
+  
   const handleChangeHost = (e) => {
     setHost(
       e.map((value) => {
@@ -73,26 +74,26 @@ export default function EditForm({id}) {
     participants,
     currentDate,
   };
-  console.log(user,'final user')
   const editMeeting = async () => {
     const res = await axios.post(`/admin/EditMeeting/${id}`, { user });
     return res.data;
   };
   const SubmitHandler = async (e) => {
     e.preventDefault();
-    // const res = await editMeeting();
-    console.log("submitted")
-    // if (res.success) {
-    //   alert("Meeting Scheduled Successfully");
-    // } else {
-    //   alert("Error in Scheduling Meeting");
-    // }
-    // navigate("/admin/");
+    const res = await editMeeting();
+    console.log(res,"submitted")
+    if (res.success) {
+      alert("Changes Committed Successfully");
+    } else {
+      alert("Error in Changing Meeting Details");
+    }
+    navigate("/admin/");
   };
 console.log(host)
 console.log(participants)
 console.log(currentDate)
 console.log(meetName)
+console.log(meeting,"data")
   return (
     <div>
       <div className="container">
@@ -129,12 +130,12 @@ console.log(meetName)
                 isMulti
                 name="host"
                 placeholder="Host.."
-                defaultValue={[{value:'asdf',label:'asdf'}]}
+                value={valueHost}
                 options={options}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeHost}
-              />
+              /> 
               <label className="label" htmlFor="meetName">
                 Select the Participants for Meeting
               </label>
@@ -142,6 +143,7 @@ console.log(meetName)
                 isMulti
                 name="participants"
                 placeholder="Participants.."
+                value={valueParticipants}
                 options={options}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -155,6 +157,9 @@ console.log(meetName)
                   renderInput={(props) => <TextField {...props} />}
                   label="DateTimePicker"
                   value={currentDate}
+                  selected={meeting.scheduledTime
+                    ?moment(meeting.scheduledTime).format('DD-MM-YYYY')
+                    :null}
                   onChange={(newValue) => {
                     setCurrentData(newValue._d);
                   }}
