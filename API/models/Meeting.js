@@ -12,22 +12,26 @@ const MeetingSchema = new mongoose.Schema(
       {
         type: ObjectId,
         ref: "User",
+        required: true,
       },
     ],
     participants: [
       {
         type: ObjectId,
         ref: "User",
+        required: true,
       },
     ],
     scheduledTime: {
       type: Date,
       default: Date.now,
+      required: true,
     },
     status: {
       type: String,
-      enum: ["Scheduled", "completed", "cancelled"],
+      enum: ["Scheduled", "Completed", "Cancelled"],
       default: "Scheduled",
+      required: true,
     },
     slug: {
       type: String,

@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
 
 exports.AllUsers = async (req, res) => {
   try {
-    console.log('AllUsers')
+    console.log("AllUsers");
     const AllUsers = await Users.find();
     if (!AllUsers) {
       return res.status(404).json({
@@ -63,12 +63,17 @@ exports.AllUsers = async (req, res) => {
 exports.AddMeeting = async (req, res) => {
   try {
     console.log("AddMeeting");
-    const { host, participants } = req.body.user;
+    console.log(req.body.user);
+    const { meetName, host, participants, currentDate } = req.body.user;
+    console.log(typeof currentDate, "type");
     const meeting = await Meeting.create({
+      meetName,
       host,
       participants,
+      scheduledTime: currentDate,
     });
-    return res.status(200).json({
+    console.log(meeting);
+    res.status(200).json({
       success: true,
       message: "Meeting created successfully",
       data: meeting,
@@ -81,7 +86,9 @@ exports.AddMeeting = async (req, res) => {
 exports.GetAllMeeting = async (req, res) => {
   try {
     console.log("GetAllMeeting");
-    const allMeeting = await Meeting.find({});
+    const allMeeting = await Meeting.find({})
+      .populate({ path: "host", select: ["firstName", "lastName"]})
+      .populate({ path: "participants", select: ["firstName", "lastName"]});
     return res.status(200).json({
       success: true,
       message: "List of all meetings ",
@@ -94,22 +101,22 @@ exports.GetAllMeeting = async (req, res) => {
 
 exports.DetailMeeting = async (req, res) => {
   try {
-    console.log('DetailMeeting')
-    console.log(req.body.user)
-    const { id } = req.body.user;
-    const meeting = await Meeting.findById(id);
+    console.log("DetailMeeting");
+    const  id  = req.params.id;
+    const meeting = await Meeting.findById(id).populate({ path: "host", select: ["firstName", "lastName"]})
+    .populate({ path: "participants", select: ["firstName", "lastName"]});
     if (!meeting) {
       return res.status(404).json({
         success: false,
         message: "Meeting not found",
-        data:{}
-      })
+        data: {},
+      });
     }
     return res.status(200).json({
-      success:true,
-      message:"Details of Meeting",
-      data: meeting
-    })
+      success: true,
+      message: "Details of Meeting",
+      data: meeting,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -122,24 +129,25 @@ exports.EditMeeting = async (req, res) => {
   }
 };
 
-exports.DeleteMeeting = async (req, res) => {
+exports.CancelMeeting = async (req, res) => {
   try {
-    console.log('DeleteMeeting')
-    console.log(req.body.user)
-    const { id } = req.body.user;
+    console.log("CancelMeeting");
+    const  id  = req.params.id;
     const meeting = await Meeting.findById(id);
     if (!meeting) {
       return res.status(404).json({
         success: false,
         message: "Meeting not found",
-        data:{}
-      })
+        data: {},
+      });
     }
+    console.log(meeting)
+    const change = await Meeting.findByIdAndUpdate(id,{status:"Cancelled"})
     return res.status(200).json({
-      success:true,
-      message:"Details of Meeting",
-      data: meeting
-    })
+      success: true,
+      message: "Meeting Cancelled",
+      data: change,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

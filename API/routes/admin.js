@@ -7,6 +7,9 @@ const loginSchema = require("../validation/loginValidation");
 router.post("/login", validation(loginSchema), adminController.login);
 router.get("/AllUsers", adminController.AllUsers);
 router.post("/AddMeeting", adminController.AddMeeting);
-router.post("/GetAllMeeting", adminController.GetAllMeeting);
+router.get("/GetAllMeeting", adminController.GetAllMeeting);
+router.get("/DetailMeeting/:id", adminController.DetailMeeting);
+router.get("/EditMeeting/:id", adminController.EditMeeting);
+router.post("/CancelMeeting/:id", adminController.CancelMeeting);
 
 module.exports = router;
