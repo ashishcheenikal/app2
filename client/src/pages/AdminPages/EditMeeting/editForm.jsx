@@ -7,14 +7,23 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
-export default function MeetingForm() {
-  const navigate = useNavigate();
+
+
+export default function EditForm({id}) {
+    const navigate = useNavigate();
+  const [meeting, setMeeting] = useState([]);
   const [users, setUsers] = useState([]);
   const [host, setHost] = useState([]);
   const [participants, setParticipant] = useState([]);
   const [meetName, setMeetName] = useState("");
   const [currentDate, setCurrentData] = useState(new Date());
 
+  const detailMeeting = async () => {
+    const res = await axios.get(`/admin/DetailMeeting/${id}`);
+    const resData = res.data.data;
+    setMeeting(resData);
+    return;
+  };
   const allUsers = async () => {
     const res = await axios.get("/admin/AllUsers");
     const resData = res.data.data;
@@ -27,12 +36,17 @@ export default function MeetingForm() {
 
   useEffect(() => {
     allUsers();
+    detailMeeting();
   }, []);
-
   const options = users.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   });
-
+  const defaultValue = meeting.host?.map((value)=>{
+    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+  })
+  {let result = Array.isArray(defaultValue)
+    console.log(defaultValue,"isArray")
+  }
   const handleChangeHost = (e) => {
     setHost(
       e.map((value) => {
@@ -59,28 +73,33 @@ export default function MeetingForm() {
     participants,
     currentDate,
   };
-  const newMeeting = async () => {
-    const res = await axios.post(`/admin/AddMeeting`, { user });
+  console.log(user,'final user')
+  const editMeeting = async () => {
+    const res = await axios.post(`/admin/EditMeeting/${id}`, { user });
     return res.data;
   };
   const SubmitHandler = async (e) => {
     e.preventDefault();
-    const res = await newMeeting();
-    if (res.success) {
-      alert("Meeting Scheduled Successfully");
-    } else {
-      alert("Error in Scheduling Meeting");
-    }
-    navigate("/admin/");
+    // const res = await editMeeting();
+    console.log("submitted")
+    // if (res.success) {
+    //   alert("Meeting Scheduled Successfully");
+    // } else {
+    //   alert("Error in Scheduling Meeting");
+    // }
+    // navigate("/admin/");
   };
-
+console.log(host)
+console.log(participants)
+console.log(currentDate)
+console.log(meetName)
   return (
     <div>
       <div className="container">
         <div className="headWrap d-flex justify-content-center">
           <div className="card-header py-5">
             <h2 className="m-0 font-weight-bold text-primary">
-              Schedule New Meetings
+              Change Meeting Details
             </h2>
           </div>
         </div>
@@ -100,6 +119,7 @@ export default function MeetingForm() {
                 type="text"
                 name="meetName"
                 id="meetName"
+                defaultValue={meeting.meetName}
                 onChange={handleChange}
               />
               <label className="label" htmlFor="meetName">
@@ -109,6 +129,7 @@ export default function MeetingForm() {
                 isMulti
                 name="host"
                 placeholder="Host.."
+                defaultValue={[{value:'asdf',label:'asdf'}]}
                 options={options}
                 className="basic-multi-select"
                 classNamePrefix="select"

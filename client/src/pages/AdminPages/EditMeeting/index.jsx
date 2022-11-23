@@ -1,14 +1,12 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../AdHome/Header";
 import SideBar from "../AdHome/SideBar";
-import MeetingForm from "./meetingForm";
+import EditForm from "./editForm";
 
-export default function AddMeeting() {
+export default function EditMeeting() {
     const navigate = useNavigate();
-    useEffect(() => {
-      console.log(sessionStorage.getItem("adminData"));
-    }, []);
+    const {id} = useParams();
     const handleLogout = () => {
       sessionStorage.removeItem("adminData");
       navigate("/admin/login");
@@ -24,7 +22,7 @@ export default function AddMeeting() {
             <Header/>
 
             <div className="container-fluid">
-              <MeetingForm/>
+              <EditForm id={id}/>
             </div>
           </div>
 
