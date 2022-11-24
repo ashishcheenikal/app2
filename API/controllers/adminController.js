@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const { generateToken } = require("../helpers/token");
 const jwt = require("jsonwebtoken");
 const Meeting = require("../models/Meeting");
+var { nanoid } = require("nanoid");
+
 
 exports.login = async (req, res) => {
   try {
@@ -63,6 +65,8 @@ exports.AllUsers = async (req, res) => {
 exports.AddMeeting = async (req, res) => {
   try {
     console.log("AddMeeting");
+    const slug = nanoid(10);;
+    console.log(slug,"nanoID")
     console.log(req.body.user);
     const { meetName, host, participants, currentDate } = req.body.user;
     const meeting = await Meeting.create({
@@ -70,6 +74,7 @@ exports.AddMeeting = async (req, res) => {
       host,
       participants,
       scheduledTime: currentDate,
+      slug
     });
     res.status(200).json({
       success: true,
@@ -83,10 +88,9 @@ exports.AddMeeting = async (req, res) => {
 
 exports.GetAllMeeting = async (req, res) => {
   try {
+    
     console.log("GetAllMeeting");
-    const allMeeting = await Meeting.find({})
-      .populate({ path: "host", select: ["firstName", "lastName"]})
-      .populate({ path: "participants", select: ["firstName", "lastName"]});
+    const allMeeting = res.paginatedResults
     return res.status(200).json({
       success: true,
       message: "List of all meetings ",

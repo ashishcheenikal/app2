@@ -4,6 +4,8 @@ import Header from "./Header";
 import SideBar from "./SideBar";
 import Table from "./Table";
 
+
+
 export default function AdHome() {
   const navigate = useNavigate();
   useEffect(() => {

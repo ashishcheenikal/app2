@@ -37,6 +37,7 @@ export default function EditForm({id}) {
   useEffect(() => {
     allUsers();
     detailMeeting();
+    
   }, []);
   const options = users.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
@@ -47,8 +48,9 @@ export default function EditForm({id}) {
   const valueParticipants = meeting.participants?.map((value)=>{
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   })
-  
+  console.log(valueHost,"valueHost")
   const handleChangeHost = (e) => {
+    console.log(e,"e-host")
     setHost(
       e.map((value) => {
         return value.value;
@@ -81,7 +83,6 @@ export default function EditForm({id}) {
   const SubmitHandler = async (e) => {
     e.preventDefault();
     const res = await editMeeting();
-    console.log(res,"submitted")
     if (res.success) {
       alert("Changes Committed Successfully");
     } else {
@@ -89,10 +90,10 @@ export default function EditForm({id}) {
     }
     navigate("/admin/");
   };
-console.log(host)
-console.log(participants)
-console.log(currentDate)
-console.log(meetName)
+console.log(host,"host")
+console.log(participants,"participants")
+console.log(currentDate,"date")
+console.log(meetName,'meetName')
 console.log(meeting,"data")
   return (
     <div>
@@ -131,6 +132,7 @@ console.log(meeting,"data")
                 name="host"
                 placeholder="Host.."
                 value={valueHost}
+                // defaultValue={valueHost}
                 options={options}
                 className="basic-multi-select"
                 classNamePrefix="select"
@@ -143,7 +145,7 @@ console.log(meeting,"data")
                 isMulti
                 name="participants"
                 placeholder="Participants.."
-                value={valueParticipants}
+                defaultValue={valueParticipants}
                 options={options}
                 className="basic-multi-select"
                 classNamePrefix="select"

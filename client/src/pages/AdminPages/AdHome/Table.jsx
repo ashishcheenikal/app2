@@ -3,24 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "../../../axios";
 import moment from "moment";
 import Swal from "sweetalert2";
+import ReactPaginate from "react-paginate";
 
 export default function Table() {
   const navigate = useNavigate();
   const [allMeeting, setAllMeeting] = useState([]);
-  const [status, setStatus] = useState(false);
-  const getMeetings = async () => {
-    const res = await axios.get("/admin/GetAllMeeting");
+  const [pageCount, setPageCount] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let limit = 3;
+
+  const getMeetings = async (currentPage) => {
+    const res = await axios.get(
+      `/admin/GetAllMeeting?page=${currentPage}&limit=${limit}`
+    );
     console.log(res.data.data);
-    setAllMeeting(res.data.data);
+    const totalCount = res.data.data.totalCount;
+    setPageCount(Math.ceil(totalCount / limit));
+    if (res.data.data.results.length < 0) {
+      <h2>No Meetings Scheduled till this</h2>;
+    } else {
+      setAllMeeting(res.data.data.results);
+    }
   };
   useEffect(() => {
-    getMeetings();
-  }, [status]);
+    getMeetings(currentPage);
+  }, [currentPage]);
 
   const cancelMeeting = async (id) => {
     await axios.post(`/admin/CancelMeeting/${id}`);
   };
-
+  const handlePageClick = async (data) => {
+    console.log(data.selected, "dataSelected");
+    setCurrentPage(data.selected + 1);
+  };
   return (
     <div>
       <div className="headWrap d-flex justify-content-between">
@@ -36,35 +52,35 @@ export default function Table() {
       <div className="col-lg-12 mb-4">
         <div className="card shadow mb-4">
           <div className="card-body">
-            {allMeeting.map((value, i) => {
-              return (
-                <table className="table" key={i}>
-                  <thead>
-                    <tr>
-                      <th scope="col" className="text-center">
-                        #
-                      </th>
-                      <th scope="col" className="text-center">
-                        Name Of Meeting
-                      </th>
-                      <th scope="col" className="text-center">
-                        Host
-                      </th>
-                      <th scope="col" className="text-center">
-                        Participants
-                      </th>
-                      <th scope="col" className="text-center">
-                        Scheduled Time
-                      </th>
-                      <th scope="col" className="text-center">
-                        Status
-                      </th>
-                      <th scope="col" className="text-center">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col" className="text-center">
+                    #
+                  </th>
+                  <th scope="col" className="text-center">
+                    Name Of Meeting
+                  </th>
+                  <th scope="col" className="text-center">
+                    Host
+                  </th>
+                  <th scope="col" className="text-center">
+                    Participants
+                  </th>
+                  <th scope="col" className="text-center">
+                    Scheduled Time
+                  </th>
+                  <th scope="col" className="text-center">
+                    Status
+                  </th>
+                  <th scope="col" className="text-center">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              {allMeeting?.map((value, i) => {
+                return (
+                  <tbody key={i}>
                     <tr>
                       <th className="text-center" scope="row">
                         {i + 1}
@@ -127,7 +143,6 @@ export default function Table() {
                                     "success"
                                   );
                                   cancelMeeting(value._id);
-                                  setStatus(true);
                                 }
                               });
                             }}
@@ -138,9 +153,29 @@ export default function Table() {
                       </td>
                     </tr>
                   </tbody>
-                </table>
-              );
-            })}
+                );
+              })}
+            </table>
+
+            <ReactPaginate
+              previousLabel={"previous"}
+              nextLabel={"next"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={3}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination justify-content-center"}
+              pageClassName={"page-item"}
+              pageLinkClassName={"page-link"}
+              previousClassName={"page-item"}
+              previousLinkClassName={"page-link"}
+              nextClassName={"page-item"}
+              nextLinkClassName={"page-link"}
+              breakClassName={"page-item"}
+              breakLinkClassName={"page-link"}
+              activeClassName={"active"}
+            />
           </div>
         </div>
       </div>

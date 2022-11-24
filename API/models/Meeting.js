@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
-const slug = require("mongoose-slug-generator");
 
 const MeetingSchema = new mongoose.Schema(
   {
@@ -35,7 +34,7 @@ const MeetingSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      slug: "host",
+      required: true,
       unique: true,
     },
   },
@@ -43,11 +42,5 @@ const MeetingSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-const options = {
-  separator: "-",
-  lang: "en",
-  truncate: 120,
-};
-MeetingSchema.plugin(slug, options);
 
 module.exports = mongoose.model("Meeting", MeetingSchema);
