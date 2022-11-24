@@ -99,7 +99,7 @@ export default function AdLogin() {
                             <></>
                           )}
                         </div>
-                        <div className="form-group">
+                        {/* <div className="form-group">
                           <div className="custom-control custom-checkbox small">
                             <input
                               type="checkbox"
@@ -113,7 +113,7 @@ export default function AdLogin() {
                               Remember Me
                             </label>
                           </div>
-                        </div>
+                        </div> */}
                         <button
                           type="submit"
                           className="btn btn-primary btn-user btn-block"

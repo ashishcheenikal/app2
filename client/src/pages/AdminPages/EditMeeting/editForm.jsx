@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
+// import Select from "react-select";
+import AsyncSelect from 'react-select/async';
 import axios from "../../../axios";
 import TextField from "@mui/material/TextField";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -9,8 +10,8 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
 
 
-export default function EditForm({id}) {
-    const navigate = useNavigate();
+export default function EditForm({ id }) {
+  const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [users, setUsers] = useState([]);
   const [host, setHost] = useState([]);
@@ -22,40 +23,44 @@ export default function EditForm({id}) {
     const res = await axios.get(`/admin/DetailMeeting/${id}`);
     const resData = res.data.data;
     setMeeting(resData);
+
+    // const valueHost = meeting.host?.map((value) => {
+    //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    // })
+    // setHost(valueHost)
     return;
   };
-  const allUsers = async () => {
-    const res = await axios.get("/admin/AllUsers");
-    const resData = res.data.data;
-    const userList = resData.filter((value) => {
-      return value.admin !== true;
-    });
-    setUsers(userList);
-    return;
-  };
+  // const allUsers = async () => {
+  //   const res = await axios.get("/admin/AllUsers");
+  //   const resData = res.data.data;
+  //   const userList = resData.filter((value) => {
+  //     return value.admin !== true;
+  //   });
+  //   setUsers(userList);
+  //   return;
+  // };
 
   useEffect(() => {
-    allUsers();
+    // allUsers();
     detailMeeting();
-    
   }, []);
-  const options = users.map((value) => {
-    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  });
-  const valueHost = meeting.host?.map((value)=>{
+  // const options = users?.map((value) => {
+  //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+  // });
+  // const valueHost = meeting.host?.map((value) => {
+  //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+  // })
+  const valueParticipants = meeting.participants?.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   })
-  const valueParticipants = meeting.participants?.map((value)=>{
-    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  })
-  console.log(valueHost,"valueHost")
+
   const handleChangeHost = (e) => {
-    console.log(e,"e-host")
-    setHost(
-      e.map((value) => {
-        return value.value;
-      })
-    );
+    // setHost(
+    //   e.map((value) => {
+    //     return value.value;
+    //   })
+    // );
+    setHost(e)
   };
 
   const handleChangeParti = (e) => {
@@ -69,6 +74,25 @@ export default function EditForm({id}) {
   const handleChange = (e) => {
     setMeetName(e.target.value);
   };
+
+  const promiseOptions = (inputValue) =>
+    new Promise(async (res, rej) => {
+      const result = await axios.get("/admin/AllUsers");
+      const resData = result.data.data;
+      const users = resData.filter((value) => {
+        return value.admin !== true;
+      });
+     
+    const detailMeeting = await axios.get(`/admin/DetailMeeting/${id}`);
+    const data = detailMeeting.data.data;
+    setHost(data.host?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    }))
+    res(users?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    }))
+    });
+
 
   const user = {
     meetName,
@@ -90,11 +114,9 @@ export default function EditForm({id}) {
     }
     navigate("/admin/");
   };
-console.log(host,"host")
-console.log(participants,"participants")
-console.log(currentDate,"date")
-console.log(meetName,'meetName')
-console.log(meeting,"data")
+  console.log(host, "host state")
+  console.log(participants, "participants")
+  console.log(meetName, "participants")
   return (
     <div>
       <div className="container">
@@ -127,26 +149,25 @@ console.log(meeting,"data")
               <label className="label" htmlFor="meetName">
                 Select the Host fot the Meeting
               </label>
-              <Select
+              <AsyncSelect
                 isMulti
                 name="host"
                 placeholder="Host.."
-                value={valueHost}
-                // defaultValue={valueHost}
-                options={options}
+                defaultInputValue={host}
+                loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeHost}
-              /> 
+              />
               <label className="label" htmlFor="meetName">
                 Select the Participants for Meeting
               </label>
-              <Select
+              <AsyncSelect
                 isMulti
                 name="participants"
                 placeholder="Participants.."
                 defaultValue={valueParticipants}
-                options={options}
+                loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeParti}
@@ -160,8 +181,8 @@ console.log(meeting,"data")
                   label="DateTimePicker"
                   value={currentDate}
                   selected={meeting.scheduledTime
-                    ?moment(meeting.scheduledTime).format('DD-MM-YYYY')
-                    :null}
+                    ? moment(meeting.scheduledTime).format('DD-MM-YYYY')
+                    : null}
                   onChange={(newValue) => {
                     setCurrentData(newValue._d);
                   }}

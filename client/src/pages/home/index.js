@@ -76,7 +76,7 @@ export default function Home() {
         <i className="fas fa-angle-up"></i>
       </button>
 
-      <div
+      {/* <div
         className="modal fade"
         id="logoutModal"
         tabIndex="-1"
@@ -117,7 +117,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

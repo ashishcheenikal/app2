@@ -41,11 +41,11 @@ export default function AdHome() {
           </footer>
         </div>
       </div>
-      <a className="scroll-to-top rounded" href="#page-top">
+      {/* <a className="scroll-to-top rounded" href="#page-top">
         <i className="fas fa-angle-up"></i>
-      </a>
+      </a> */}
 
-      <div
+      {/* <div
         className="modal fade"
         id="logoutModal"
         tabIndex="-1"
@@ -86,7 +86,7 @@ export default function AdHome() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

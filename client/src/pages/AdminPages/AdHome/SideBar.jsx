@@ -21,15 +21,15 @@ export default function SideBar() {
           <hr className="sidebar-divider my-0" />
 
           <li className="nav-item">
-            <a className="nav-link" href="index.html">
+            <Link className="nav-link" to="/admin/">
               <i className="fas fa-fw fa-tachometer-alt"></i>
               <span>Dashboard</span>
-            </a>
+            </Link>
           </li>
 
           <hr className="sidebar-divider" />
 
-          <div className="sidebar-heading">Interface</div>
+          {/* <div className="sidebar-heading">Interface</div>
 
           <li className="nav-item">
             <a
@@ -156,11 +156,11 @@ export default function SideBar() {
             </a>
           </li>
 
-          <hr className="sidebar-divider d-none d-md-block" />
+          <hr className="sidebar-divider d-none d-md-block" /> */}
 
-          <div className="text-center d-none d-md-inline">
+          {/* <div className="text-center d-none d-md-inline">
             <button className="rounded-circle border-0" id="sidebarToggle"></button>
-          </div>
+          </div> */}
         </ul>
     </div>
   )
