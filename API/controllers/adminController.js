@@ -44,7 +44,8 @@ exports.login = async (req, res) => {
 exports.AllUsers = async (req, res) => {
   try {
     console.log("AllUsers");
-    const AllUsers = await Users.find();
+    const AllUsers = res.searchResults
+    console.log(AllUsers)
     if (!AllUsers) {
       return res.status(404).json({
         success: false,

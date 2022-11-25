@@ -191,3 +191,17 @@ exports.newPassword = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.GetAllMeeting = async (req, res) => {
+  try {
+    console.log("GetAllMeeting/user");
+    const allMeeting = res.paginatedResults
+    return res.status(200).json({
+      success: true,
+      message: "List of all meetings ",
+      data: allMeeting,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

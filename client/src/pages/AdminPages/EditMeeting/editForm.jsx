@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import Select from "react-select";
 import AsyncSelect from 'react-select/async';
 import axios from "../../../axios";
 import TextField from "@mui/material/TextField";
@@ -18,20 +17,23 @@ export default function EditForm({ id }) {
   const [participants, setParticipant] = useState([]);
   const [meetName, setMeetName] = useState("");
   const [currentDate, setCurrentData] = useState(new Date());
+const hosts = useRef(null)
 
   const detailMeeting = async () => {
     const res = await axios.get(`/admin/DetailMeeting/${id}`);
     const resData = res.data.data;
     setMeeting(resData);
-
-    // const valueHost = meeting.host?.map((value) => {
-    //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    // })
-    // setHost(valueHost)
-    return;
+    hosts.current = meeting.host?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    })
+    setParticipant(meeting.participants?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    }))
+    return resData;
   };
+  let limit = 30
   // const allUsers = async () => {
-  //   const res = await axios.get("/admin/AllUsers");
+  //   const res = await axios.get(`/admin/AllUsers?key=""&limit=${limit}`);
   //   const resData = res.data.data;
   //   const userList = resData.filter((value) => {
   //     return value.admin !== true;
@@ -41,15 +43,13 @@ export default function EditForm({ id }) {
   // };
 
   useEffect(() => {
-    // allUsers();
-    detailMeeting();
+      // allUsers();
+      detailMeeting();
   }, []);
-  // const options = users?.map((value) => {
-  //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  // });
-  // const valueHost = meeting.host?.map((value) => {
-  //   return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  // })
+
+  const valueHost = meeting.host?.map((value) => {
+    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+  })
   const valueParticipants = meeting.participants?.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
   })
@@ -60,7 +60,8 @@ export default function EditForm({ id }) {
     //     return value.value;
     //   })
     // );
-    setHost(e)
+    console.log(e,"host format")
+    // setHost(e)
   };
 
   const handleChangeParti = (e) => {
@@ -75,24 +76,16 @@ export default function EditForm({ id }) {
     setMeetName(e.target.value);
   };
 
-  const promiseOptions = (inputValue) =>
-    new Promise(async (res, rej) => {
-      const result = await axios.get("/admin/AllUsers");
+  const promiseOptions = async(inputValue) =>{
+      const result = await axios.get(`/admin/AllUsers?key=${inputValue}&limit=${limit}`);
       const resData = result.data.data;
-      const users = resData.filter((value) => {
-        return value.admin !== true;
-      });
-     
-    const detailMeeting = await axios.get(`/admin/DetailMeeting/${id}`);
-    const data = detailMeeting.data.data;
-    setHost(data.host?.map((value) => {
+      console.log(resData.results)
+      const users = resData.results
+    return (users?.map((value) => {
       return { value: value._id, label: `${value.firstName} ${value.lastName}` };
     }))
-    res(users?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    }))
-    });
-
+    };
+    
 
   const user = {
     meetName,
@@ -114,9 +107,7 @@ export default function EditForm({ id }) {
     }
     navigate("/admin/");
   };
-  console.log(host, "host state")
-  console.log(participants, "participants")
-  console.log(meetName, "participants")
+
   return (
     <div>
       <div className="container">
@@ -153,8 +144,8 @@ export default function EditForm({ id }) {
                 isMulti
                 name="host"
                 placeholder="Host.."
-                defaultInputValue={host}
-                loadOptions={promiseOptions}
+                value={hosts.current}
+                loadOptions={promiseOptions} 
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeHost}

@@ -1,6 +1,5 @@
 const { models } = require("mongoose");
 const Meeting = require("../models/Meeting");
-const jwt = require("jsonwebtoken")
 
 exports.paginatedResults = (model) => {
   return async (req, res, next) => {
@@ -8,18 +7,12 @@ exports.paginatedResults = (model) => {
     const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const token = JSON.parse(req.headers.authorization)
-    const decode = jwt.verify(token,process.env.JWT_SECRET_KEY)
-    const id = decode.id
+   
     const results = {};
     try {
       results.totalCount = await model.countDocuments();
       results.results = await model
-        .find({
-          $or: [
-            { host: id},
-            { participants: id },
-          ]})
+        .find({})
         .populate({ path: "host", select: ["firstName", "lastName"] })
         .populate({ path: "participants", select: ["firstName", "lastName"] })
         .skip(startIndex)

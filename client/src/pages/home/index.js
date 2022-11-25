@@ -1,5 +1,7 @@
 import { useEffect } from "react";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Header from "./Header";
+import Table from "./Table";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -14,69 +16,24 @@ export default function Home() {
     <div>
       <div id="wrapper">
         <div id="content-wrapper" className="d-flex flex-column">
-          <div id="content " style={{ height: "100vh" }}>
-            <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-              <ul className="navbar-nav ml-auto">
-                <li className="nav-item dropdown no-arrow">
-                  <button
-                    className="nav-link dropdown-toggle"
-                    id="userDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    <span className="mr-2 d-none d-lg-inline text-gray-600 small">
-                      Douglas McGee
-                    </span>
-                    <img
-                      className="img-profile rounded-circle"
-                      src="img/undraw_profile.svg"
-                      alt="img"
-                    />
-                  </button>
-                  <div
-                    className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                    aria-labelledby="userDropdown"
-                  >
-                    <button className="dropdown-item">
-                      <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                      Profile
-                    </button>
-                    <button className="dropdown-item">
-                      <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                      Settings
-                    </button>
-                    <button className="dropdown-item">
-                      <i className="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                      Activity Log
-                    </button>
-                    <div className="dropdown-divider"></div>
-                    <button
-                      className="dropdown-item"
-                      data-toggle="modal"
-                      data-target="#logoutModal"
-                    >
-                      <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                      Logout
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </nav>
-
-            <div className="container">
-              <h1 className="h3 mb-4 text-gray-800">Blank Page</h1>
+          <div id="content">
+            <Header />
+            <div className="container-fluid">
+              <Table />
             </div>
           </div>
+
+          <footer className="sticky-footer bg-white">
+            <div className="container my-auto">
+              <div className="copyright text-center my-auto">
+                <span>Copyright &copy; Your Website 2020</span>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
 
-      <button className="scroll-to-top rounded">
-        <i className="fas fa-angle-up"></i>
-      </button>
-
-      {/* <div
+      <div
         className="modal fade"
         id="logoutModal"
         tabIndex="-1"
@@ -111,13 +68,18 @@ export default function Home() {
               >
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={handleLogout}>
+              <button
+                className="btn btn-primary"
+                type="button"
+                data-dismiss="modal"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

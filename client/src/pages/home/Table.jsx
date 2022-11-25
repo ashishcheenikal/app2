@@ -1,22 +1,24 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "../../../axios";
-import moment from "moment";
-import Swal from "sweetalert2";
+import moment from 'moment';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+// import axios from "../../axios"
 import ReactPaginate from "react-paginate";
+import axios from 'axios';
+
 
 export default function Table() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
   const [allMeeting, setAllMeeting] = useState([]);
   const [pageCount, setPageCount] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [status,setStatus] = useState(false);
 
   let limit = 3;
-
   const getMeetings = async (currentPage) => {
+    const token = sessionStorage.getItem("userData")
+    console.log(token,"token");
     const res = await axios.get(
-      `/admin/GetAllMeeting?page=${currentPage}&limit=${limit}`
+      `${process.env.REACT_APP_BACKEND_URL}/GetAllMeeting?page=${currentPage}&limit=${limit}`,
+      { headers: {Authorization : `${token}`}}
     );
     console.log(res.data.data);
     const totalCount = res.data.data.totalCount;
@@ -29,25 +31,21 @@ export default function Table() {
   };
   useEffect(() => {
     getMeetings(currentPage);
-  }, [currentPage,status]);
-
-  const cancelMeeting = async (id) => {
-    await axios.post(`/admin/CancelMeeting/${id}`);
-  };
+  }, [currentPage]);
   const handlePageClick = async (data) => {
     setCurrentPage(data.selected + 1);
   };
   return (
     <div>
-      <div className="headWrap d-flex justify-content-between">
+        <div className="headWrap d-flex justify-content-between">
         <div className="card-header py-3">
           <h2 className="m-0 font-weight-bold text-primary">Meetings</h2>
         </div>
-        <div className="AddMeeting mb-3 mr-3">
+        {/* <div className="AddMeeting mb-3 mr-3">
           <Link className="btn btn-primary p-2 shadow " to="/admin/AddMeeting">
             Add New Meeting
           </Link>
-        </div>
+        </div> */}
       </div>
       <div className="col-lg-12 mb-4">
         <div className="card shadow mb-4">
@@ -64,9 +62,9 @@ export default function Table() {
                   <th scope="col" className="text-center">
                     Host
                   </th>
-                  <th scope="col" className="text-center">
+                  {/* <th scope="col" className="text-center">
                     Participants
-                  </th>
+                  </th> */}
                   <th scope="col" className="text-center">
                     Scheduled Time
                   </th>
@@ -96,7 +94,7 @@ export default function Table() {
                           );
                         })}
                       </td>
-                      <td className="text-center" key={i + 1}>
+                      {/* <td className="text-center" key={i + 1}>
                         {value.participants.map((data, i) => {
                           return (
                             <div
@@ -105,7 +103,7 @@ export default function Table() {
                             >{`${data.firstName} ${data.lastName}`}</div>
                           );
                         })}
-                      </td>
+                      </td> */}
                       <td className="text-center">
                         {moment(value.scheduledTime).format(
                           "DD/MM/YYYY - HH:MM A"
@@ -113,42 +111,12 @@ export default function Table() {
                       </td>
                       <td className="text-center">{value.status}</td>
                       <td className="action d-flex justify-content-around">
-                        <div className="edit btn btn-primary">
+                        <div className="btn btn-success">
                           <span
                             onClick={() => {
-                              navigate(`/admin/EditMeeting/${value._id}`);
+                              navigate(`/meeting/${value.slug}`);
                             }}
-                          >
-                            <i className="fas fa-edit"></i>
-                          </span>
-                        </div>
-                        <div className="delete btn btn-danger">
-                          <span
-                            onClick={() => {
-                              Swal.fire({
-                                title: "Cancelling Meeting !",
-                                text: "Do you want to cancel this Meeting?",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#DD6B55",
-                                confirmButtonText: "Yes, I am sure!",
-                                cancelButtonText: "No",
-                                closeOnConfirm: false,
-                                closeOnCancel: false,
-                              }).then((result) => {
-                                if (result.isConfirmed) {
-                                  Swal.fire(
-                                    "Deleted!",
-                                    "Meeting has been Cancelled.",
-                                    "success"
-                                  );
-                                  cancelMeeting(value._id);
-                                  setStatus(prev => !prev)
-                                }
-                              });
-                            }}
-                          >
-                            <i className="fa fa-trash"></i>
+                          >JOIN
                           </span>
                         </div>
                       </td>
@@ -181,5 +149,6 @@ export default function Table() {
         </div>
       </div>
     </div>
-  );
+  )
 }
+ 
