@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AsyncSelect from 'react-select/async';
+import AsyncSelect from "react-select/async";
 import axios from "../../../axios";
 import TextField from "@mui/material/TextField";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -8,60 +8,40 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
 
-
 export default function EditForm({ id }) {
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
-  const [users, setUsers] = useState([]);
   const [host, setHost] = useState([]);
   const [participants, setParticipant] = useState([]);
   const [meetName, setMeetName] = useState("");
   const [currentDate, setCurrentData] = useState(new Date());
-const hosts = useRef(null)
 
   const detailMeeting = async () => {
     const res = await axios.get(`/admin/DetailMeeting/${id}`);
     const resData = res.data.data;
     setMeeting(resData);
-    hosts.current = meeting.host?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    })
-    setParticipant(meeting.participants?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    }))
-    return resData;
+    return resData; 
   };
-  let limit = 30
-  // const allUsers = async () => {
-  //   const res = await axios.get(`/admin/AllUsers?key=""&limit=${limit}`);
-  //   const resData = res.data.data;
-  //   const userList = resData.filter((value) => {
-  //     return value.admin !== true;
-  //   });
-  //   setUsers(userList);
-  //   return;
-  // };
+  let limit = 30;
 
   useEffect(() => {
-      // allUsers();
-      detailMeeting();
+    detailMeeting();
   }, []);
 
   const valueHost = meeting.host?.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  })
+  });
   const valueParticipants = meeting.participants?.map((value) => {
     return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  })
+  });
 
   const handleChangeHost = (e) => {
-    // setHost(
-    //   e.map((value) => {
-    //     return value.value;
-    //   })
-    // );
-    console.log(e,"host format")
-    // setHost(e)
+    setHost(
+      e.map((value) => {
+        return value.value;
+      })
+    );
+    console.log(e, "host format");
   };
 
   const handleChangeParti = (e) => {
@@ -76,16 +56,19 @@ const hosts = useRef(null)
     setMeetName(e.target.value);
   };
 
-  const promiseOptions = async(inputValue) =>{
-      const result = await axios.get(`/admin/AllUsers?key=${inputValue}&limit=${limit}`);
-      const resData = result.data.data;
-      console.log(resData.results)
-      const users = resData.results
-    return (users?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    }))
-    };
-    
+  const promiseOptions = async (inputValue) => {
+    const result = await axios.get(
+      `/admin/AllUsers?key=${inputValue}&limit=${limit}`
+    );
+    const resData = result.data.data;
+    const users = resData.results;
+    return users?.map((value) => {
+      return {
+        value: value._id,
+        label: `${value.firstName} ${value.lastName}`,
+      };
+    });
+  };
 
   const user = {
     meetName,
@@ -93,10 +76,12 @@ const hosts = useRef(null)
     participants,
     currentDate,
   };
+
   const editMeeting = async () => {
     const res = await axios.post(`/admin/EditMeeting/${id}`, { user });
     return res.data;
   };
+
   const SubmitHandler = async (e) => {
     e.preventDefault();
     const res = await editMeeting();
@@ -144,8 +129,8 @@ const hosts = useRef(null)
                 isMulti
                 name="host"
                 placeholder="Host.."
-                value={hosts.current}
-                loadOptions={promiseOptions} 
+                value={valueHost}
+                loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeHost}
@@ -157,6 +142,7 @@ const hosts = useRef(null)
                 isMulti
                 name="participants"
                 placeholder="Participants.."
+                value={valueParticipants}
                 defaultValue={valueParticipants}
                 loadOptions={promiseOptions}
                 className="basic-multi-select"
@@ -171,9 +157,11 @@ const hosts = useRef(null)
                   renderInput={(props) => <TextField {...props} />}
                   label="DateTimePicker"
                   value={currentDate}
-                  selected={meeting.scheduledTime
-                    ? moment(meeting.scheduledTime).format('DD-MM-YYYY')
-                    : null}
+                  selected={
+                    meeting.scheduledTime
+                      ? moment(meeting.scheduledTime).format("DD-MM-YYYY")
+                      : null
+                  }
                   onChange={(newValue) => {
                     setCurrentData(newValue._d);
                   }}
