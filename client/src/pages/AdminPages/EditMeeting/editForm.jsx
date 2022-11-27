@@ -7,49 +7,61 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+
+const editFormSchema = yup.object().shape({
+  meetName: yup.string().required("This field is required").min(5).max(30),
+  // host: yup.string().required("This field is required"),
+  // participants: yup.string().required("This field is required"),
+});
+
 
 export default function EditForm({ id }) {
+
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [host, setHost] = useState([]);
   const [participants, setParticipant] = useState([]);
   const [meetName, setMeetName] = useState("");
   const [currentDate, setCurrentData] = useState(new Date());
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(editFormSchema),
+  });
 
   const detailMeeting = async () => {
     const res = await axios.get(`/admin/DetailMeeting/${id}`);
     const resData = res.data.data;
     setMeeting(resData);
-    return resData; 
+    return resData;
   };
+
   let limit = 30;
 
   useEffect(() => {
     detailMeeting();
-  }, []);
+  }, [])
 
-  const valueHost = meeting.host?.map((value) => {
-    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  });
-  const valueParticipants = meeting.participants?.map((value) => {
-    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  });
+  useEffect(() => {
+    setHost(meeting.host?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    }))
+    setParticipant(meeting.participants?.map((value) => {
+      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
+    }))
+  }, [meeting])
 
   const handleChangeHost = (e) => {
-    setHost(
-      e.map((value) => {
-        return value.value;
-      })
-    );
-    console.log(e, "host format");
+    setHost(e);
   };
 
   const handleChangeParti = (e) => {
-    setParticipant(
-      e.map((value) => {
-        return value.value;
-      })
-    );
+    setParticipant(e)
   };
 
   const handleChange = (e) => {
@@ -72,8 +84,12 @@ export default function EditForm({ id }) {
 
   const user = {
     meetName,
-    host,
-    participants,
+    host: host?.map((value) => {
+      return value.value;
+    }),
+    participants: participants?.map((value) => {
+      return value.value;
+    }),
     currentDate,
   };
 
@@ -121,35 +137,52 @@ export default function EditForm({ id }) {
                 id="meetName"
                 defaultValue={meeting.meetName}
                 onChange={handleChange}
+                // {...register("meetName")}
               />
-              <label className="label" htmlFor="meetName">
+              {/* {errors.meetName ? (
+                            <span className="text-red-900" style={{color:"red"}}>{errors.meetName.message}</span>
+                          ) : (
+                            <></>
+                          )} */}
+              <label className="label" htmlFor="host">
                 Select the Host fot the Meeting
               </label>
               <AsyncSelect
                 isMulti
                 name="host"
                 placeholder="Host.."
-                value={valueHost}
+                value={host}
                 loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
+                // {...register("host")
                 onChange={handleChangeHost}
               />
-              <label className="label" htmlFor="meetName">
+              {errors.host ? (
+                            <span className="text-red-900" style={{color:"red"}}>{errors.host.message}</span>
+                          ) : (
+                            <></>
+                          )}
+              <label className="label" htmlFor="participants">
                 Select the Participants for Meeting
               </label>
               <AsyncSelect
                 isMulti
                 name="participants"
                 placeholder="Participants.."
-                value={valueParticipants}
-                defaultValue={valueParticipants}
+                value={participants}
                 loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeParti}
+                // {...register("participants")}
               />
-              <label className="label" htmlFor="meetName">
+                {/* {errors.participants ? (
+                              <span className="text-red-900" style={{color:"red"}}>{errors.participants.message}</span>
+                            ) : (
+                              <></>
+                            )} */}
+              <label className="label" htmlFor="DateTimePicker">
                 Schedule the Date and Time for the Meeting
               </label>
               <LocalizationProvider dateAdapter={AdapterMoment}>

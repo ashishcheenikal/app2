@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 import axios from "../../../axios";
 import TextField from "@mui/material/TextField";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
@@ -9,44 +9,38 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 export default function MeetingForm() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
   const [host, setHost] = useState([]);
   const [participants, setParticipant] = useState([]);
   const [meetName, setMeetName] = useState("");
   const [currentDate, setCurrentData] = useState(new Date());
 
-  const allUsers = async () => {
-    const res = await axios.get("/admin/AllUsers");
-    const resData = res.data.data;
-    const userList = resData.filter((value) => {
-      return value.admin !== true;
-    });
-    setUsers(userList);
-    return;
-  };
+  const limit = 30
 
   useEffect(() => {
-    allUsers();
+    console.log(host)
+    console.log(participants)
   }, []);
 
-  const options = users.map((value) => {
-    return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-  });
+  const promiseOptions = async (inputValue) => {
+    const result = await axios.get(
+      `/admin/AllUsers?key=${inputValue}&limit=${limit}`
+    );
+    const resData = result.data.data;
+    const users = resData.results;
+    return users?.map((value) => {
+      return {
+        value: value._id,
+        label: `${value.firstName} ${value.lastName}`,
+      };
+    });
+  };
 
   const handleChangeHost = (e) => {
-    setHost(
-      e.map((value) => {
-        return value.value;
-      })
-    );
+    setHost(e);
   };
 
   const handleChangeParti = (e) => {
-    setParticipant(
-      e.map((value) => {
-        return value.value;
-      })
-    );
+    setParticipant(e)
   };
 
   const handleChange = (e) => {
@@ -55,8 +49,12 @@ export default function MeetingForm() {
 
   const user = {
     meetName,
-    host,
-    participants,
+    host: host?.map((value) => {
+      return value.value;
+    }),
+    participants: participants?.map((value) => {
+      return value.value;
+    }),
     currentDate,
   };
   const newMeeting = async () => {
@@ -105,11 +103,11 @@ export default function MeetingForm() {
               <label className="label" htmlFor="meetName">
                 Select the Host fot the Meeting
               </label>
-              <Select
+              <AsyncSelect
                 isMulti
                 name="host"
                 placeholder="Host.."
-                options={options}
+                loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeHost}
@@ -117,11 +115,11 @@ export default function MeetingForm() {
               <label className="label" htmlFor="meetName">
                 Select the Participants for Meeting
               </label>
-              <Select
+              <AsyncSelect
                 isMulti
                 name="participants"
                 placeholder="Participants.."
-                options={options}
+                loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeParti}
