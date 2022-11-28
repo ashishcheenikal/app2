@@ -18,7 +18,7 @@ export default function Table() {
     console.log(token,"token");
     const res = await axios.get(
       `${process.env.REACT_APP_BACKEND_URL}/GetAllMeeting?page=${currentPage}&limit=${limit}`,
-      { headers: {Authorization : `${token}`}}
+      { headers: {Authorization : `Bearer ${token}`}}
     );
     console.log(res.data.data);
     const totalCount = res.data.data.totalCount;

@@ -51,6 +51,7 @@ export default function Table() {
       </div>
       <div className="col-lg-12 mb-4">
         <div className="card shadow mb-4">
+        {allMeeting?.length?
           <div className="card-body">
             <table className="table">
               <thead>
@@ -178,6 +179,7 @@ export default function Table() {
               activeClassName={"active"}
             />
           </div>
+          :  <h2>Add New Meetings , Currently NO meeting availble</h2> }
         </div>
       </div>
     </div>

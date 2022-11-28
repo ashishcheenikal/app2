@@ -7,13 +7,14 @@ const paginatedResults = require('../middleware/paginationAdmin');
 const Meeting = require("../models/Meeting");
 const { searchResults } = require("../middleware/search");
 const users = require("../models/users");
+const { authRoute } = require("../middleware/authRoute");
 
 router.post("/login", validation(loginSchema), adminController.login);
-router.get("/AllUsers",searchResults(users), adminController.AllUsers);
-router.post("/AddMeeting", adminController.AddMeeting);
-router.get("/GetAllMeeting", paginatedResults.paginatedResults(Meeting), adminController.GetAllMeeting);
-router.get("/DetailMeeting/:id", adminController.DetailMeeting);
-router.post("/EditMeeting/:id", adminController.EditMeeting);
-router.post("/CancelMeeting/:id", adminController.CancelMeeting);
+router.get("/AllUsers",authRoute,searchResults(users), adminController.AllUsers);
+router.post("/AddMeeting",authRoute, adminController.AddMeeting);
+router.get("/GetAllMeeting",authRoute, paginatedResults.paginatedResults(Meeting), adminController.GetAllMeeting);
+router.get("/DetailMeeting/:id",authRoute, adminController.DetailMeeting);
+router.post("/EditMeeting/:id",authRoute, adminController.EditMeeting);
+router.post("/CancelMeeting/:id",authRoute, adminController.CancelMeeting);
 
 module.exports = router;

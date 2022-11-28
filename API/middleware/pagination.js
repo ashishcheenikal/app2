@@ -8,7 +8,8 @@ exports.paginatedResults = (model) => {
     const limit = parseInt(req.query.limit);
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-    const token = JSON.parse(req.headers.authorization)
+    const tmp = req.headers.authorization
+    const token = JSON.parse(tmp ? tmp.slice(7, tmp.length) : "")
     const decode = jwt.verify(token,process.env.JWT_SECRET_KEY)
     const id = decode.id
     let query = {}
