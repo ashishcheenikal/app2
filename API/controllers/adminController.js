@@ -19,6 +19,13 @@ exports.login = async (req, res) => {
         data: {},
       });
     }
+    if(!user.admin){
+      return res.json({
+        success: false,
+        message: "You are not authorized to access this website",
+        data: {},
+      });
+    }
     const check = await bcrypt.compare(password, user.password);
     if (!check) {
       return res.json({

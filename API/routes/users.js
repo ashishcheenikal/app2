@@ -15,6 +15,7 @@ router.post('/login', validation(loginSchema), userController.login)
 router.post('/resetPassword',validation(resetSchema), userController.resetPassword)
 router.post('/newPassword/:id/:token',validation(passSchema), userController.newPassword)
 router.get("/GetAllMeeting", paginatedResults(Meeting), userController.GetAllMeeting);
+// router.get("/ejs",userController.test);
 
 
 

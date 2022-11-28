@@ -11,15 +11,19 @@ exports.paginatedResults = (model) => {
     const token = JSON.parse(req.headers.authorization)
     const decode = jwt.verify(token,process.env.JWT_SECRET_KEY)
     const id = decode.id
+    let query = {}
+    if(id){
+      query = {
+        $or: [
+          { host: id},
+          { participants: id },
+        ]}
+    }
     const results = {};
     try {
-      results.totalCount = await model.countDocuments();
+      results.totalCount = await model.countDocuments(query);
       results.results = await model
-        .find({
-          $or: [
-            { host: id},
-            { participants: id },
-          ]})
+        .find(query)
         .populate({ path: "host", select: ["firstName", "lastName"] })
         .populate({ path: "participants", select: ["firstName", "lastName"] })
         .skip(startIndex)

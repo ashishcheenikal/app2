@@ -23,7 +23,7 @@ export default function Table() {
     console.log(res.data.data);
     const totalCount = res.data.data.totalCount;
     setPageCount(Math.ceil(totalCount / limit));
-    if (res.data.data.results.length < 0) {
+    if (res.data.data.results.length == 0) {
       <h2>No Meetings Scheduled till this</h2>;
     } else {
       setAllMeeting(res.data.data.results);
@@ -49,6 +49,7 @@ export default function Table() {
       </div>
       <div className="col-lg-12 mb-4">
         <div className="card shadow mb-4">
+              {allMeeting?.length?
           <div className="card-body">
             <table className="table">
               <thead>
@@ -76,7 +77,7 @@ export default function Table() {
                   </th>
                 </tr>
               </thead>
-              {allMeeting?.map((value, i) => {
+              { allMeeting?.map((value, i) => {
                 return (
                   <tbody key={i}>
                     <tr>
@@ -124,7 +125,7 @@ export default function Table() {
                   </tbody>
                 );
               })}
-            </table>
+            </table> 
 
             <ReactPaginate
               previousLabel={"previous"}
@@ -146,6 +147,8 @@ export default function Table() {
               activeClassName={"active"}
             />
           </div>
+              :  <h2>No Meetings Scheduled till this</h2> }
+
         </div>
       </div>
     </div>

@@ -6,6 +6,7 @@ dotenv.config();
 const mongoose = require("mongoose");
 const userRouter= require("./routes/users") 
 const adminRouter= require("./routes/admin") 
+const path = require('path')
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -17,6 +18,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+
 
 app.use('/',userRouter)
 app.use('/admin',adminRouter) 
