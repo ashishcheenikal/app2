@@ -13,7 +13,10 @@ import * as yup from "yup";
 
 const editFormSchema = yup.object().shape({
   meetName: yup.string().required("This field is required").min(5).max(30),
-  host: yup.string().required("This field is required"),
+  host: yup.object().shape({
+    label: yup.string().required("Required"),
+    value: yup.string().required("Required")
+}),
   participants: yup.string().required("This field is required"),
 });
 
@@ -159,7 +162,7 @@ export default function EditForm({ id }) {
                 onChange={handleChangeHost}
               />
               {/* {errors.host ? (
-                            <span className="text-red-900" style={{color:"red"}}>{errors.host.message}</span>
+                            <span className="text-red-900" style={{color:"red"}}>{errors.host.label.message}</span>
                           ) : (
                             <></>
                           )} */}

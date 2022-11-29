@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,6 +13,11 @@ const userInitial = {
 export default function AdLogin() {
   const [user, setUser] = useState(userInitial);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    sessionStorage.removeItem("userData");
+  }, [])
+
   const login = async () => {
     const { data } = await axios.post(
       `${process.env.REACT_APP_BACKEND_URL}/admin/login`,

@@ -11,8 +11,13 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(function (config) {
-  const token = sessionStorage.getItem("adminData" || "userData");
-  config.headers.Authorization = token ? `Bearer ${token}` : "";
+  const adminToken = sessionStorage.getItem("adminData");
+  const userToken = sessionStorage.getItem("userData");
+  config.headers.Authorization = adminToken
+    ? `Bearer ${adminToken}`
+    : userToken
+    ? `Bearer ${userToken}`
+    : "";
   return config;
 });
 

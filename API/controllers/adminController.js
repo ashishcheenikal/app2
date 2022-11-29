@@ -3,8 +3,9 @@ const bcrypt = require("bcrypt");
 const { generateToken } = require("../helpers/token");
 const jwt = require("jsonwebtoken");
 const Meeting = require("../models/Meeting");
-var { nanoid } = require("nanoid");
-
+const { nanoid } = require("nanoid");
+const { fork } = require("child_process");
+const sendMail = require("../helpers/sendMail");
 
 exports.login = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ exports.login = async (req, res) => {
         data: {},
       });
     }
-    if(!user.admin){
+    if (!user.admin) {
       return res.json({
         success: false,
         message: "You are not authorized to access this website",
@@ -51,8 +52,8 @@ exports.login = async (req, res) => {
 exports.AllUsers = async (req, res) => {
   try {
     console.log("AllUsers");
-    const AllUsers = res.searchResults
-    console.log(AllUsers)
+    const AllUsers = res.searchResults;
+    console.log(AllUsers);
     if (!AllUsers) {
       return res.status(404).json({
         success: false,
@@ -73,8 +74,8 @@ exports.AllUsers = async (req, res) => {
 exports.AddMeeting = async (req, res) => {
   try {
     console.log("AddMeeting");
-    const slug = nanoid(10);;
-    console.log(slug,"nanoID")
+    const slug = nanoid(10);
+    console.log(slug, "nanoID");
     console.log(req.body.user);
     const { meetName, host, participants, currentDate } = req.body.user;
     const meeting = await Meeting.create({
@@ -82,8 +83,9 @@ exports.AddMeeting = async (req, res) => {
       host,
       participants,
       scheduledTime: currentDate,
-      slug
+      slug,
     });
+
     res.status(200).json({
       success: true,
       message: "Meeting created successfully",
@@ -96,9 +98,8 @@ exports.AddMeeting = async (req, res) => {
 
 exports.GetAllMeeting = async (req, res) => {
   try {
-    
     console.log("GetAllMeeting");
-    const allMeeting = res.paginatedResults
+    const allMeeting = res.paginatedResults;
     return res.status(200).json({
       success: true,
       message: "List of all meetings ",
@@ -112,9 +113,10 @@ exports.GetAllMeeting = async (req, res) => {
 exports.DetailMeeting = async (req, res) => {
   try {
     console.log("DetailMeeting");
-    const  id  = req.params.id;
-    const meeting = await Meeting.findById(id).populate({ path: "host", select: ["firstName", "lastName"]})
-    .populate({ path: "participants", select: ["firstName", "lastName"]});
+    const id = req.params.id;
+    const meeting = await Meeting.findById(id)
+      .populate({ path: "host", select: ["firstName", "lastName"] })
+      .populate({ path: "participants", select: ["firstName", "lastName"] });
     if (!meeting) {
       return res.status(404).json({
         success: false,
@@ -134,12 +136,17 @@ exports.DetailMeeting = async (req, res) => {
 
 exports.EditMeeting = async (req, res) => {
   try {
-    console.log("EditMeeting")
+    console.log("EditMeeting");
     const id = req.params.id;
-    console.log(id)
+    console.log(id);
     console.log(req.body.user);
     const { meetName, host, participants, currentDate } = req.body.user;
-    const meeting = await Meeting.findByIdAndUpdate(id,{meetName, host, participants, scheduledTime: currentDate})
+    const meeting = await Meeting.findByIdAndUpdate(id, {
+      meetName,
+      host,
+      participants,
+      scheduledTime: currentDate,
+    });
     res.status(200).json({
       success: true,
       message: "Meeting Edited successfully",
@@ -153,7 +160,7 @@ exports.EditMeeting = async (req, res) => {
 exports.CancelMeeting = async (req, res) => {
   try {
     console.log("CancelMeeting");
-    const  id  = req.params.id;
+    const id = req.params.id;
     const meeting = await Meeting.findById(id);
     if (!meeting) {
       return res.status(404).json({
@@ -162,12 +169,24 @@ exports.CancelMeeting = async (req, res) => {
         data: {},
       });
     }
-    console.log(meeting)
-    const change = await Meeting.findByIdAndUpdate(id,{status:"Cancelled"})
+    console.log(meeting);
+    const change = await Meeting.findByIdAndUpdate(id, { status: "Cancelled" });
     return res.status(200).json({
       success: true,
       message: "Meeting Cancelled",
       data: change,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.sendMail = (req,res) => {
+  try {
+    const child = fork(sendMail);
+    child.send("sendMail");
+    child.on("message", (data) => {
+      console.log(data, "data evide kitty");
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

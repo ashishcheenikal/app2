@@ -93,18 +93,18 @@ exports.resetPassword = async (req, res) => {
         data: {},
       });
     }
-    let secret = process.env.JWT_SECRET_KEY + user.password;
+
+    let secret = process.env.JWT_SECRET_KEY + user.password ;
     const id = user._id.toString();
+
     let payload = {
       email: email,
       id: id,
     };
+
     const token = jwt.sign(payload, secret, {
       expiresIn: "15m",
     });
-    console.log(
-      token
-    )
     let transporter = nodemailer.createTransport({
       service: "gmail",
       secure: false, // true for 465, false for other ports
@@ -146,7 +146,7 @@ exports.newPassword = async (req, res) => {
   try {
     const { id, token } = req.params;
     const { password, confirmPassword } = req.body.user;
-    const user = await Users.findOne({ id });
+    const user = await Users.findById(id);
     if (!user) {
       return res.json({
         success: false,
@@ -154,10 +154,10 @@ exports.newPassword = async (req, res) => {
         data: {},
       });
     }
-
-    let secret = process.env.JWT_SECRET_KEY + user.password;
+    let secret = process.env.JWT_SECRET_KEY  + user.password;
 
     const payload = jwt.verify(token, secret);
+    console.log(payload);
     if (!payload) {
       return res.json({
         success: false,
