@@ -12,10 +12,16 @@ const { authRoute } = require("../middleware/authRoute");
 
 
 router.post('/register', validation(registerSchema),userController.register)
+
 router.post('/login', validation(loginSchema), userController.login)
+
 router.post('/resetPassword',validation(resetSchema), userController.resetPassword)
+
 router.post('/newPassword/:id/:token',validation(passSchema), userController.newPassword)
+
 router.get("/GetAllMeeting",authRoute, paginatedResults(Meeting), userController.GetAllMeeting);
+
+router.get("/meeting/:id",authRoute,userController.joinMeeting)
 
 
 

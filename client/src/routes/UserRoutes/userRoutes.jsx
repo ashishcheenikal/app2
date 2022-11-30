@@ -6,6 +6,7 @@ import NotLoggedIn from "./NotLoggedIn";
 import LoggedIn from "./LoggedIn";
 import ForgetPassword from "../../pages/ForgetPassword";
 import NewPassword from "../../pages/ForgetPassword/NewPassword";
+import JoinMeeting from "../../pages/JoinMeeting";
 
 
 export default function UserRoutes() {
@@ -14,6 +15,7 @@ export default function UserRoutes() {
             <Routes>
                 <Route element={<LoggedIn />}>
                     <Route path="/" element={<Home />} />
+                    <Route path="/meeting/:id" element={<JoinMeeting />} />
                 </Route>
                 <Route element={<NotLoggedIn />}>
                     <Route path="/login" element={<Login />} />

@@ -194,21 +194,21 @@ exports.CancelMeeting = async (req, res) => {
   }
 };
 
-exports.sendMail = async (req, res) => {
-  try {
-    const id = "637e6ce8f0c726a84fa5478a";
-    const meeting = await Meeting.findById(id)
-      .populate({ path: "host", select: ["firstName", "lastName", "email"] })
-      .populate({
-        path: "participants",
-        select: ["firstName", "lastName", "email"],
-      });
-    const child = fork("./views/sendMail");
-    child.send({meeting:meeting});
-    child.on("message", (data) => {
-      console.log("Child exited with a code of ",data);
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+// exports.sendMail = async (req, res) => {
+//   try {
+//     const id = "637dc38e171d3bd4f76dfdc0";
+//     const meeting = await Meeting.findById(id)
+//       .populate({ path: "host", select: ["firstName", "lastName", "email"] })
+//       .populate({
+//         path: "participants",
+//         select: ["firstName", "lastName", "email"],
+//       });
+//     const child = fork("./views/sendMail");
+//     child.send({meeting:meeting});
+//     child.on("message", (data) => {
+//       console.log("Child exited with a code of ",data);
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };

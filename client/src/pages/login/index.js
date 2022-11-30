@@ -52,6 +52,10 @@ export default function Login() {
     console.log(check, "check");
     if (check.success) {
       sessionStorage.setItem("userData", JSON.stringify(check.data.token));
+      if(sessionStorage.getItem("url")){
+        const url = sessionStorage.getItem("url");
+        navigate(url)
+      }
       navigate("/");
     } else {
       alert(check.message);

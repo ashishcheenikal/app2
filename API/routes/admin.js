@@ -24,6 +24,6 @@ router.post("/EditMeeting/:id",authRoute, validation(MeetingSchema),adminControl
 
 router.post("/CancelMeeting/:id",authRoute, adminController.CancelMeeting);
 
-router.get("/sendMail",adminController.sendMail);
+// router.get("/sendMail",adminController.sendMail);
 
 module.exports = router;

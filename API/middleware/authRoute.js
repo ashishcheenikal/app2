@@ -4,7 +4,6 @@ exports.authRoute = async (req, res, next) => {
   try {
     let tmp = req.headers.authorization;
     const token = JSON.parse(tmp ? tmp.slice(7, tmp.length) : "")
-    console.log(token,"token")
     if (!token) {
       return res.status(401).json({ message: "Invalid Authentification no token" });
     }
@@ -12,6 +11,7 @@ exports.authRoute = async (req, res, next) => {
       if (err) {
         return res.status(401).json({ message: "Invalid Authentification token error" });
       }
+    console.log(user,"token-decoded")
       req.user = user;
       next();
     });

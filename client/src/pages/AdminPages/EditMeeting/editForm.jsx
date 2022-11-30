@@ -8,21 +8,19 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import moment from "moment";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 
 const editFormSchema = yup.object().shape({
   meetName: yup.string().required("This field is required").min(5).max(30),
-  host: yup.object().shape({
-    label: yup.string().required("Required"),
-    value: yup.string().required("Required")
-}),
-  participants: yup.string().required("This field is required"),
+  // host: yup.object().shape({
+  //   label: yup.string().required("Required(label)"),
+  //   value: yup.string().required("Required"),
+  // }),
+  // participants: yup.string().required("This field is required"),
 });
 
-
 export default function EditForm({ id }) {
-
   const navigate = useNavigate();
   const [meeting, setMeeting] = useState([]);
   const [host, setHost] = useState([]);
@@ -33,6 +31,7 @@ export default function EditForm({ id }) {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm({
     resolver: yupResolver(editFormSchema),
   });
@@ -48,23 +47,33 @@ export default function EditForm({ id }) {
 
   useEffect(() => {
     detailMeeting();
-  }, [])
+  }, []);
 
   useEffect(() => {
-    setHost(meeting.host?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    }))
-    setParticipant(meeting.participants?.map((value) => {
-      return { value: value._id, label: `${value.firstName} ${value.lastName}` };
-    }))
-  }, [meeting])
+    setHost(
+      meeting.host?.map((value) => {
+        return {
+          value: value._id,
+          label: `${value.firstName} ${value.lastName}`,
+        };
+      })
+    );
+    setParticipant(
+      meeting.participants?.map((value) => {
+        return {
+          value: value._id,
+          label: `${value.firstName} ${value.lastName}`,
+        };
+      })
+    );
+  }, [meeting]);
 
   const handleChangeHost = (e) => {
     setHost(e);
   };
 
   const handleChangeParti = (e) => {
-    setParticipant(e)
+    setParticipant(e);
   };
 
   const handleChange = (e) => {
@@ -97,12 +106,14 @@ export default function EditForm({ id }) {
   };
 
   const editMeeting = async () => {
+    console.log(user);
     const res = await axios.post(`/admin/EditMeeting/${id}`, { user });
     return res.data;
   };
 
-  const SubmitHandler = async (e) => {
+  const SubmitHandler = async (e, data) => {
     e.preventDefault();
+    console.log(data, "submit");
     const res = await editMeeting();
     if (res.success) {
       alert("Changes Committed Successfully");
@@ -140,13 +151,7 @@ export default function EditForm({ id }) {
                 id="meetName"
                 defaultValue={meeting.meetName}
                 onChange={handleChange}
-                // {...register("meetName")}
               />
-              {/* {errors.meetName ? (
-                            <span className="text-red-900" style={{color:"red"}}>{errors.meetName.message}</span>
-                          ) : (
-                            <></>
-                          )} */}
               <label className="label" htmlFor="host">
                 Select the Host fot the Meeting
               </label>
@@ -158,14 +163,8 @@ export default function EditForm({ id }) {
                 loadOptions={promiseOptions}
                 className="basic-multi-select"
                 classNamePrefix="select"
-                // {...register("host")}
                 onChange={handleChangeHost}
               />
-              {/* {errors.host ? (
-                            <span className="text-red-900" style={{color:"red"}}>{errors.host.label.message}</span>
-                          ) : (
-                            <></>
-                          )} */}
               <label className="label" htmlFor="participants">
                 Select the Participants for Meeting
               </label>
@@ -178,13 +177,7 @@ export default function EditForm({ id }) {
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChangeParti}
-                // {...register("participants")}
               />
-                {/* {errors.participants ? (
-                              <span className="text-red-900" style={{color:"red"}}>{errors.participants.message}</span>
-                            ) : (
-                              <></>
-                            )} */}
               <label className="label" htmlFor="DateTimePicker">
                 Schedule the Date and Time for the Meeting
               </label>

@@ -4,6 +4,7 @@ const { generateToken } = require("../helpers/token");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
+const { findOne } = require("../models/users");
 
 exports.register = async (req, res) => {
   try {
@@ -195,3 +196,27 @@ exports.GetAllMeeting = async (req, res) => {
   }
 };
 
+exports.joinMeeting = async(req,res)=>{
+  try {
+    const slug = req.params.id;
+    const userId = req.user.id;
+    console.log(slug,"slug")
+    console.log(userId,"userId")
+    const meeting = await findOne({slug: slug});
+    if(meeting.host.includes(userId) || meeting.participants.includes(userId))
+    {
+      return res.status(200).json({
+        success : true,
+        message : "Joined meeting successfully",
+        data : meeting
+      })
+    }
+    return res.status(403).json({
+      success : true,
+        message : "This user is not a member of this meeting",
+        data : {}
+    });
+  } catch (error) {
+    res.status(500).json({message:error.message})
+  }
+}
