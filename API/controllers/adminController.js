@@ -5,7 +5,9 @@ const jwt = require("jsonwebtoken");
 const Meeting = require("../models/Meeting");
 const { nanoid } = require("nanoid");
 const { fork } = require("child_process");
-const sendMail = require("../helpers/sendMail");
+const nodemailer = require("nodemailer");
+const ejs = require("ejs");
+
 
 exports.login = async (req, res) => {
   try {
@@ -78,14 +80,25 @@ exports.AddMeeting = async (req, res) => {
     console.log(slug, "nanoID");
     console.log(req.body.user);
     const { meetName, host, participants, currentDate } = req.body.user;
-    const meeting = await Meeting.create({
+    const addMeeting = await Meeting.create({
       meetName,
       host,
       participants,
       scheduledTime: currentDate,
       slug,
     });
-
+    const id = addMeeting._id
+    const meeting = await Meeting.findById(id)
+      .populate({ path: "host", select: ["firstName", "lastName", "email"] })
+      .populate({
+        path: "participants",
+        select: ["firstName", "lastName", "email"],
+      });
+    const child = fork("./views/sendMail");
+    child.send({meeting:meeting});
+    child.on("exit", (data) => {
+      console.log("Child exited with a code of ",data);
+    });
     res.status(200).json({
       success: true,
       message: "Meeting created successfully",
@@ -181,12 +194,19 @@ exports.CancelMeeting = async (req, res) => {
   }
 };
 
-exports.sendMail = (req,res) => {
+exports.sendMail = async (req, res) => {
   try {
-    const child = fork(sendMail);
-    child.send("sendMail");
+    const id = "637e6ce8f0c726a84fa5478a";
+    const meeting = await Meeting.findById(id)
+      .populate({ path: "host", select: ["firstName", "lastName", "email"] })
+      .populate({
+        path: "participants",
+        select: ["firstName", "lastName", "email"],
+      });
+    const child = fork("./views/sendMail");
+    child.send({meeting:meeting});
     child.on("message", (data) => {
-      console.log(data, "data evide kitty");
+      console.log("Child exited with a code of ",data);
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
