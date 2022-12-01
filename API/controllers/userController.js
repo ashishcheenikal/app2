@@ -4,7 +4,7 @@ const { generateToken } = require("../helpers/token");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
-const { findOne } = require("../models/users");
+const Meeting = require("../models/Meeting");
 
 exports.register = async (req, res) => {
   try {
@@ -53,7 +53,7 @@ exports.login = async (req, res) => {
         data: {},
       });
     }
-    if(user.admin){
+    if (user.admin) {
       return res.json({
         success: false,
         message: "You are not authorized to access this website",
@@ -95,7 +95,7 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    let secret = process.env.JWT_SECRET_KEY + user.password ;
+    let secret = process.env.JWT_SECRET_KEY + user.password;
     const id = user._id.toString();
 
     let payload = {
@@ -155,7 +155,7 @@ exports.newPassword = async (req, res) => {
         data: {},
       });
     }
-    let secret = process.env.JWT_SECRET_KEY  + user.password;
+    let secret = process.env.JWT_SECRET_KEY + user.password;
 
     const payload = jwt.verify(token, secret);
     console.log(payload);
@@ -196,27 +196,33 @@ exports.GetAllMeeting = async (req, res) => {
   }
 };
 
-exports.joinMeeting = async(req,res)=>{
+exports.joinMeeting = async (req, res) => {
   try {
-    const slug = req.params.id;
+    const slug = req.params.slug;
     const userId = req.user.id;
-    console.log(slug,"slug")
-    console.log(userId,"userId")
-    const meeting = await findOne({slug: slug});
-    if(meeting.host.includes(userId) || meeting.participants.includes(userId))
-    {
-      return res.status(200).json({
-        success : true,
-        message : "Joined meeting successfully",
-        data : meeting
-      })
+    console.log(slug, "slug");
+    console.log(userId, "userId");
+    if(slug == ""){
+      throw new Error("Invalid meeting ID")
     }
-    return res.status(403).json({
-      success : true,
-        message : "This user is not a member of this meeting",
-        data : {}
+    const meeting = await Meeting.findOne({slug:slug})
+    console.log(meeting,"meeting")
+    if (
+      meeting?.host.includes(userId) ||
+      meeting?.participants.includes(userId)
+    ) {
+      return res.status(200).json({
+        success: true,
+        message: "Joined meeting successfully",
+        data: meeting,
+      });
+    }
+    return res.status(200).json({
+      success: false,
+      message: "This user is not invited for this meeting",
+      data: {},
     });
   } catch (error) {
-    res.status(500).json({message:error.message})
+   res.status(500).json({ message: error.message });
   }
-}
+};

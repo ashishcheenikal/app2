@@ -9,6 +9,7 @@ export default function EditMeeting() {
     const {id} = useParams();
     const handleLogout = () => {
       sessionStorage.removeItem("adminData");
+      sessionStorage.clear()
       navigate("/admin/login");
     };
   return (

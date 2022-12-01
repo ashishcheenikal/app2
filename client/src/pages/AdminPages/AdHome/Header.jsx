@@ -5,6 +5,7 @@ export default function Header() {
 
   const handleLogout = () => {
     sessionStorage.removeItem("adminData");
+    sessionStorage.clear()
     navigate("/admin/login");
   };
   return (

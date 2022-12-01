@@ -11,6 +11,7 @@ export default function AddMeeting() {
     }, []);
     const handleLogout = () => {
       sessionStorage.removeItem("adminData");
+      sessionStorage.clear()
       navigate("/admin/login");
     };
   return (

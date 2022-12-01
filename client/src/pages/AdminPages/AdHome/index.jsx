@@ -11,10 +11,7 @@ export default function AdHome() {
   useEffect(() => {
     console.log(sessionStorage.getItem("adminData"));
   }, []);
-  const handleLogout = () => {
-    sessionStorage.removeItem("adminData");
-    navigate("/admin/login");
-  };
+  
   return (
     <div>
       <div id="wrapper">

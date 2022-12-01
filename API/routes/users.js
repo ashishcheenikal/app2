@@ -21,7 +21,7 @@ router.post('/newPassword/:id/:token',validation(passSchema), userController.new
 
 router.get("/GetAllMeeting",authRoute, paginatedResults(Meeting), userController.GetAllMeeting);
 
-router.get("/meeting/:id",authRoute,userController.joinMeeting)
+router.get("/meeting/:slug",authRoute,userController.joinMeeting)
 
 
 

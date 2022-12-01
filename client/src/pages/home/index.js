@@ -10,6 +10,7 @@ export default function Home() {
   }, []);
   const handleLogout = () => {
     sessionStorage.removeItem("userData");
+    sessionStorage.clear();
     navigate("/login");
   };
   return (

@@ -53,10 +53,13 @@ export default function Login() {
     if (check.success) {
       sessionStorage.setItem("userData", JSON.stringify(check.data.token));
       if(sessionStorage.getItem("url")){
-        const url = sessionStorage.getItem("url");
-        navigate(url)
-      }
+        const finalURL = sessionStorage.getItem("url");
+        console.log(finalURL)
+        sessionStorage.removeItem("url")
+        window.location.href=finalURL;
+      }else{
       navigate("/");
+      }
     } else {
       alert(check.message);
     }

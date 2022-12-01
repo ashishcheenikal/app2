@@ -15,7 +15,7 @@ export default function UserRoutes() {
             <Routes>
                 <Route element={<LoggedIn />}>
                     <Route path="/" element={<Home />} />
-                    <Route path="/meeting/:id" element={<JoinMeeting />} />
+                    <Route path="/meeting/:slug" element={<JoinMeeting />} />
                 </Route>
                 <Route element={<NotLoggedIn />}>
                     <Route path="/login" element={<Login />} />
