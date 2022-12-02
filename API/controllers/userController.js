@@ -200,21 +200,25 @@ exports.joinMeeting = async (req, res) => {
   try {
     const slug = req.params.slug;
     const userId = req.user.id;
-    console.log(slug, "slug");
-    console.log(userId, "userId");
-    if(slug == ""){
-      throw new Error("Invalid meeting ID")
+    if (slug == "") {
+      throw new Error("Invalid meeting ID");
     }
-    const meeting = await Meeting.findOne({slug:slug})
-    console.log(meeting,"meeting")
+    let meeting = await Meeting.findOne({ slug: slug })
+      .populate({ path: "host", select: ["firstName", "lastName"] })
+      .populate({ path: "participants", select: ["firstName", "lastName"] });
     if (
-      meeting?.host.includes(userId) ||
-      meeting?.participants.includes(userId)
+      meeting?.host.map((val) => {
+        val._id == userId;
+      }) ||
+      meeting?.participants.map((val) => {
+        val._id == userId;
+      })
     ) {
       return res.status(200).json({
         success: true,
         message: "Joined meeting successfully",
         data: meeting,
+        userId,
       });
     }
     return res.status(200).json({
@@ -223,6 +227,6 @@ exports.joinMeeting = async (req, res) => {
       data: {},
     });
   } catch (error) {
-   res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };

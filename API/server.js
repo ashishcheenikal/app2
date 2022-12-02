@@ -4,12 +4,14 @@ const app = express();
 const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
-const userRouter= require("./routes/users") 
-const adminRouter= require("./routes/admin") 
-const path = require('path')
+const userRouter = require("./routes/users");
+const adminRouter = require("./routes/admin");
+const path = require("path");
+const socket = require("socket.io");
+const { disconnect } = require("process");
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: `${process.env.RESET_URL}`,
   successStatus: 200,
 };
 
@@ -19,22 +21,46 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'ejs')
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
-
-app.use('/',userRouter)
-app.use('/admin',adminRouter) 
+app.use("/", userRouter);
+app.use("/admin", adminRouter);
 
 mongoose
   .connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
   })
-  .then((data) => console.log("DataBase connection established"))
-  .catch((error)=>console.log("Error in DataBase onnection establishing : " ,error))
+  .then((data) => console.log("DataBase Connection established"))
+  .catch((error) =>
+    console.log("Error in DataBase Connection establishing : ", error)
+  );
 
-  let port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 
-  app.listen(port,()=>{
-    console.log('listening on port ' + port);
+const server = app.listen(port, () => {
+  console.log("listening on port " + port);
+});
+
+const io = socket(server, {
+  cors: {
+    origin:  `${process.env.RESET_URL}`,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`user joined server ${socket.id}`,);
+  socket.on("join_room",(data)=>{
+    const {slug, userID} = data
+    socket.join(slug)
+    let createdTime = Date.now();
+    socket.to(slug).emit('receive_message', {
+      message: `${userID} has joined the chat room`,
+      username: `${userID}`,
+      createdTime,
+    });
   })
+  socket.on("disconnect",()=>[
+    console.log("disconnected")
+  ])
+});
