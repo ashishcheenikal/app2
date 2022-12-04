@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 
-export default function LiveChat({ detailMeeting, slug, userID }) {
+export default function LiveChat({ detailMeeting, slug, userID ,socket}) {
   const [messagesRecieved, setMessagesReceived] = useState([]);
 
   useEffect(() => {
-    const socket = io(`${process.env.REACT_APP_BACKEND_URL}`);
-    socket.emit("join_room", { userID, slug });
     socket.on("receive_message", (data) => {
-      console.log(data)
+      console.log(data,"data for receive_message")
       setMessagesReceived(data);
     });
-  }, []);
+  }, [socket]) 
+  
   return (
     <div>
       <div className="chat-container">

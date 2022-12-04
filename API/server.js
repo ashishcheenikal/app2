@@ -51,14 +51,16 @@ const io = socket(server, {
 io.on("connection", (socket) => {
   console.log(`user joined server ${socket.id}`,);
   socket.on("join_room",(data)=>{
+    console.log(data)
     const {slug, userID} = data
     socket.join(slug)
-    let createdTime = Date.now();
-    socket.to(slug).emit('receive_message', {
+    let createdTime =new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes();
+    let welcomeMessage = {
       message: `${userID} has joined the chat room`,
       username: `${userID}`,
-      createdTime,
-    });
+      createdTime
+    }
+    socket.to(slug).emit('receive_message', welcomeMessage);
   })
   socket.on("disconnect",()=>[
     console.log("disconnected")
