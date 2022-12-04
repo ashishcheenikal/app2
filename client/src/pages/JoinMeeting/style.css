@@ -306,6 +306,7 @@ body.dark .btn-close-right {
   overflow: hidden;
   display: flex;
   flex-wrap: wrap;
+  background-color: rgb(65, 58, 58);
 }
 .video-participant {
   width: 33.3%;

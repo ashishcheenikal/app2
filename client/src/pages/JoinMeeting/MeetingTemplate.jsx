@@ -1,10 +1,16 @@
-import { useState } from "react";
+import {useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LiveChat from "./LiveChat";
 import "./style.css";
 
-export default function MeetingTemplate() {
+export default function MeetingTemplate({detailMeeting , slug , userID }) {
   const [visibleChat, setVisibleChat] = useState(false);
+  // const fetchUsers
+  useEffect(() => {
+   console.log(detailMeeting,"adfadsgdfgs")
+   console.log(slug)
+  }, [])
+  
   return (
     <div>
       <div className="app-container">
@@ -29,7 +35,6 @@ export default function MeetingTemplate() {
             </Link>
 
             <Link
-              o
               className="nav-link icon"
               onClick={() => {
                 setVisibleChat((prev) => !prev);
@@ -101,7 +106,7 @@ export default function MeetingTemplate() {
           </button>
           <div className="chat-header">
           </div>
-          {visibleChat && <LiveChat />}
+          {visibleChat && <LiveChat detailMeeting={detailMeeting} slug={slug} userID={userID}/>}
         </div>
         <button className="expand-btn">
           {/* <!-- expand icon --> */}

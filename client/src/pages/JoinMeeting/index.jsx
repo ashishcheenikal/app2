@@ -6,9 +6,10 @@ import MeetingTemplate from "./MeetingTemplate";
 
 export default function JoinMeeting() {
   const [meeting, setMeeting] = useState(false);
+  const [detailMeeting, setDetailMeeting] = useState([]);
+  const [userID, setUserID] = useState("");
   const navigate = useNavigate();
   const { slug } = useParams();
-  console.log(slug);
   const meetingDetails = () => {
     return new Promise(async (res, rej) => {
       try {
@@ -30,7 +31,9 @@ export default function JoinMeeting() {
           "success"
         ).then((result) => {
           if (result.isConfirmed) {
-           setMeeting(check.success)
+            setMeeting(check.success);
+            setDetailMeeting(check.data);
+            setUserID(check.userId);
           }
         });
       } else {
@@ -49,8 +52,13 @@ export default function JoinMeeting() {
 
   return (
     <div>
-     {meeting && <MeetingTemplate />}
+      {meeting && (
+        <MeetingTemplate
+          detailMeeting={detailMeeting}
+          slug={slug}
+          userID={userID}
+        />
+      )}
     </div>
   );
-  
 }
