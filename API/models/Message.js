@@ -4,16 +4,17 @@ const { ObjectId } = mongoose.Schema;
 const MessageSchema = new mongoose.Schema(
   {
     roomId: {
-      type: Array,
+      type: String,
     },
+    // users: Array,
     sender: {
       type: ObjectId,
       ref: "User",
       required: true,
     },
-    text : {
-        type: String,
-    }
+    message: {
+      text: { type: String, required: true },
+    },
   },
   {
     timestamps: true,

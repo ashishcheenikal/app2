@@ -22,7 +22,7 @@ export default function Table() {
     console.log(res.data.data);
     const totalCount = res.data.data.totalCount;
     setPageCount(Math.ceil(totalCount / limit));
-    if (res.data.data.results.length == 0) {
+    if (res.data.data.results.length === 0) {
       <h2>No Meetings Scheduled till this</h2>;
     } else {
       setAllMeeting(res.data.data.results);

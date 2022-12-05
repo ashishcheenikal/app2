@@ -1,23 +1,14 @@
 import {useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LiveChat from "./LiveChat";
-import { io } from "socket.io-client";
 import "./style.css";
 
 
-export default function MeetingTemplate({detailMeeting , slug , userID }) {
-  const socket = io(`${process.env.REACT_APP_BACKEND_URL}`);
+export default function MeetingTemplate({detailMeeting , slug , userID ,userName }) {
+
   const [visibleChat, setVisibleChat] = useState(false);
-  // const fetchUsers
-  useEffect(() => {
-   console.log(detailMeeting,"detailMeeting")
-   console.log(slug,"slug")
-  }, [])
   
-  useEffect(() => {
-    socket.emit("join_room", { userID, slug });
-  }, [socket]);
-  
+ 
   return (
     <div>
       <div className="app-container">
@@ -113,7 +104,7 @@ export default function MeetingTemplate({detailMeeting , slug , userID }) {
           </button>
           <div className="chat-header">
           </div>
-          {visibleChat && <LiveChat detailMeeting={detailMeeting} slug={slug} userID={userID} socket={socket}/>}
+          {visibleChat && <LiveChat detailMeeting={detailMeeting} slug={slug} userID={userID} />}
         </div>
         <button className="expand-btn">
           {/* <!-- expand icon --> */}

@@ -8,7 +8,6 @@ const userRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
 const path = require("path");
 const socket = require("socket.io");
-const { disconnect } = require("process");
 
 const corsOptions = {
   origin: `${process.env.RESET_URL}`,
@@ -44,25 +43,34 @@ const server = app.listen(port, () => {
 
 const io = socket(server, {
   cors: {
-    origin:  `${process.env.RESET_URL}`,
+    origin: `${process.env.RESET_URL}`,
   },
 });
 
 io.on("connection", (socket) => {
-  console.log(`user joined server ${socket.id}`,);
-  socket.on("join_room",(data)=>{
-    console.log(data)
-    const {slug, userID} = data
-    socket.join(slug)
-    let createdTime =new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes();
-    let welcomeMessage = {
-      message: `${userID} has joined the chat room`,
-      username: `${userID}`,
-      createdTime
-    }
-    socket.to(slug).emit('receive_message', welcomeMessage);
-  })
-  socket.on("disconnect",()=>[
-    console.log("disconnected")
-  ])
+  console.log(`user joined server ${socket.id}`);
+  socket.on("join_room", (data) => {
+    console.log(data);
+    const { slug, userID ,userName} = data;
+    socket.join(slug);
+    console.log(`${socket.id} joined the ${slug}`);
+    const joinData = {
+      room: slug,
+      author: userID,
+      authorName: userName,
+      message: `${userName} has joined the chat room`,
+      time:
+        new Date(Date.now()).getHours() +
+        ":" +
+        new Date(Date.now()).getMinutes(),
+    };
+    socket.to(slug).emit("join_message", joinData);
+  });
+
+  socket.on("send_message", (data) => {
+    console.log(data, "send_message");
+    socket.to(data.room).emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => [console.log("disconnected")]);
 });
