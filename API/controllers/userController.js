@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const Meeting = require("../models/Meeting");
+const Message = require("../models/Message");
 
 exports.register = async (req, res) => {
   try {
@@ -231,4 +232,24 @@ exports.joinMeeting = async (req, res) => {
   }
 };
 
-
+exports.getAllMessages = async(req,res)=>{
+  try {
+    const roomId = req.body.data
+    console.log(roomId)
+    const allMessages = await Message.find({roomId}).limit(50)
+    if(!allMessages){
+      return res.status(200).json({
+        success: false,
+        message: "No messages available",
+        data: {},
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Last 50 messages",
+      data: allMessages,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}

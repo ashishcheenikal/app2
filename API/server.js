@@ -8,6 +8,7 @@ const userRouter = require("./routes/users");
 const adminRouter = require("./routes/admin");
 const path = require("path");
 const socket = require("socket.io");
+const Message = require("./models/Message");
 
 const corsOptions = {
   origin: `${process.env.RESET_URL}`,
@@ -51,7 +52,7 @@ io.on("connection", (socket) => {
   console.log(`user joined server ${socket.id}`);
   socket.on("join_room", (data) => {
     console.log(data);
-    const { slug, userID ,userName} = data;
+    const { slug, userID, userName } = data;
     socket.join(slug);
     console.log(`${socket.id} joined the ${slug}`);
     const joinData = {
@@ -69,6 +70,18 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (data) => {
     console.log(data, "send_message");
+    const savingMessage = async () => {
+      try {
+        await Message.create({
+          roomId: data.room,
+          sender: data.author,
+          message: data.message,
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+    savingMessage();
     socket.to(data.room).emit("receive_message", data);
   });
 
