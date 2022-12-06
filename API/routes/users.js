@@ -23,6 +23,8 @@ router.get("/GetAllMeeting",authRoute, paginatedResults(Meeting), userController
 
 router.get("/meeting/:slug",authRoute,userController.joinMeeting)
 
+router.get("/getAllMessages/:slug",authRoute,userController.getAllMessages)
+
 
 
 

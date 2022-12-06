@@ -9,6 +9,8 @@ const adminRouter = require("./routes/admin");
 const path = require("path");
 const socket = require("socket.io");
 const Message = require("./models/Message");
+const { createClient } = require("redis");
+const { createAdapter } = require("@socket.io/redis-adapter");
 
 const corsOptions = {
   origin: `${process.env.RESET_URL}`,
@@ -46,6 +48,22 @@ const io = socket(server, {
   cors: {
     origin: `${process.env.RESET_URL}`,
   },
+});
+
+const pubClient = createClient({ url: "redis://localhost:6379" });
+const subClient = pubClient.duplicate();
+
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+  io.adapter(createAdapter(pubClient, subClient));
+  io.listen(5000);
+});
+
+pubClient.on("error", (err) => {
+  console.log(err.message);
+});
+
+subClient.on("error", (err) => {
+  console.log(err.message);
 });
 
 io.on("connection", (socket) => {

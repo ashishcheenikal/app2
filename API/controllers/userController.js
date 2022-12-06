@@ -232,24 +232,26 @@ exports.joinMeeting = async (req, res) => {
   }
 };
 
-exports.getAllMessages = async(req,res)=>{
+exports.getAllMessages = async (req, res) => {
   try {
-    const roomId = req.body.data
-    console.log(roomId)
-    const allMessages = await Message.find({roomId}).limit(50)
-    if(!allMessages){
+    const roomId = req.params.slug;
+    console.log(roomId);
+    const allMessages = await Message.find({ roomId })
+      .populate({ path: "sender", select: ["firstName", "lastName"] })
+      .limit(50);
+    if (allMessages.length > 0) {
       return res.status(200).json({
-        success: false,
-        message: "No messages available",
-        data: {},
+        success: true,
+        message: "Last 50 messages",
+        data: allMessages,
       });
     }
     return res.status(200).json({
-      success: true,
-      message: "Last 50 messages",
-      data: allMessages,
+      success: false,
+      message: "No messages available",
+      data: {},
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}
+};
