@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+import axios from "../../axios";
 import { socket } from "../../socket";
 
 export default function LiveChat({ detailMeeting, slug, userID }) {
@@ -13,16 +14,42 @@ export default function LiveChat({ detailMeeting, slug, userID }) {
   const joinRoom = () => {
     socket.emit("join_room", { userID, slug, userName });
     socket.on("join_message", (data) => {
-      console.log(data, "data for receive_message");
       setMessageList((list) => [...list, data]);
     });
   };
 
+  const getAllMessages = async () => {
+    try {
+      const { data } = await axios.get(`/getAllMessages/${slug}`);
+      const msgArray = data.data?.map((val) => {
+        const msg = {
+          room: val.roomId,
+          author: val.sender._id,
+          authorName: val.sender.firstName + " " + val.sender.lastName,
+          message: val.message,
+          time:
+            new Date(val.createdAt).getHours() +
+            ":" +
+            new Date(val.createdAt).getMinutes(),
+        };
+        return msg;
+      });
+      const allMessages = msgArray?.map((msg) => {
+        setMessageList((list) => [...list, msg]);
+      });
+    } catch (error) {
+      console.log("Message :", error.message);
+    }
+  };
   useEffect(() => {
     joinRoom();
+    getAllMessages();
+     return () => {
+      socket.off('join_message');
+    };
   }, []);
 
-  const sendMessage = async () => {
+  const sendMessage = async () => { 
     try {
       if (currentMessage !== "") {
         const messageData = {
@@ -49,7 +76,9 @@ export default function LiveChat({ detailMeeting, slug, userID }) {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-    console.log(messageList, "receive_message");
+    return () => {
+      socket.off('receive_message');
+    };
   }, []);
 
   return (
@@ -66,11 +95,12 @@ export default function LiveChat({ detailMeeting, slug, userID }) {
             </div> */}
             <div className="chat-body">
               <ScrollToBottom className="message-container">
-                {messageList.map((messageContent) => {
+                {messageList.map((messageContent, i) => {
                   return (
                     <div
                       className="message"
                       id={userID === messageContent.author ? "you" : "other"}
+                      key={i}
                     >
                       <div>
                         <div className="message-meta">
