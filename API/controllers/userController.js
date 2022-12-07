@@ -238,7 +238,8 @@ exports.getAllMessages = async (req, res) => {
     console.log(roomId);
     const allMessages = await Message.find({ roomId })
       .populate({ path: "sender", select: ["firstName", "lastName"] })
-      .limit(50);
+      .limit(50)
+      .sort({_id: 1});
     if (allMessages.length > 0) {
       return res.status(200).json({
         success: true,

@@ -17,7 +17,7 @@ const corsOptions = {
   successStatus: 200,
 };
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); 
 
 app.use(express.json());
 
@@ -55,7 +55,7 @@ const subClient = pubClient.duplicate();
 
 Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
   io.adapter(createAdapter(pubClient, subClient));
-  io.listen(5000);
+  // io.listen(5000);
 });
 
 pubClient.on("error", (err) => {

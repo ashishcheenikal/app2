@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../axios";
 import Swal from "sweetalert2";
+import MeetingLandingPage from "./MeetingLandingPage";
 import MeetingTemplate from "./MeetingTemplate";
 
 export default function JoinMeeting() {
+  const [meetingVisibility, setMeetingVisibility] = useState(false);
   const [meeting, setMeeting] = useState(false);
   const [detailMeeting, setDetailMeeting] = useState([]);
   const [userID, setUserID] = useState("");
@@ -23,19 +25,22 @@ export default function JoinMeeting() {
 
   useEffect(() => {
     meetingDetails().then((check) => {
-      console.log(check, "check");
+      // console.log(check, "check");
       if (check.success) {
-        Swal.fire(
-          "Joined the Meeting successfully",
-          "Join Now!",
-          "success"
-        ).then((result) => {
-          if (result.isConfirmed) {
-            setMeeting(check.success);
-            setDetailMeeting(check.data);
-            setUserID(check.userId);
-          }
-        });
+        // Swal.fire(
+        //   "Joined the Meeting successfully",
+        //   "Join Now!",
+        //   "success"
+        // ).then((result) => {
+        //   if (result.isConfirmed) {
+        //     setMeeting(check.success);
+        //     setDetailMeeting(check.data);
+        //     setUserID(check.userId);
+        //   }
+        // });
+        setMeeting(check.success);
+        setDetailMeeting(check.data);
+        setUserID(check.userId);
       } else {
         Swal.fire(
           "You are not invited to this Meeting!",
@@ -53,12 +58,20 @@ export default function JoinMeeting() {
   return (
     <div>
       {meeting && (
+        <MeetingLandingPage
+          detailMeeting={detailMeeting}
+          slug={slug}
+          userID={userID}
+          setMeeting={setMeeting}
+        />
+      )}
+      {/* {meetingVisibility && (
         <MeetingTemplate
           detailMeeting={detailMeeting}
           slug={slug}
           userID={userID}
         />
-      )}
+      )} */}
     </div>
   );
 }
