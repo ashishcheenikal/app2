@@ -7,7 +7,6 @@ import MeetingTemplate from "./MeetingTemplate";
 
 export default function JoinMeeting() {
   const [meetingVisibility, setMeetingVisibility] = useState(false);
-  const [meeting, setMeeting] = useState(false);
   const [detailMeeting, setDetailMeeting] = useState([]);
   const [userID, setUserID] = useState("");
   const navigate = useNavigate();
@@ -25,20 +24,7 @@ export default function JoinMeeting() {
 
   useEffect(() => {
     meetingDetails().then((check) => {
-      // console.log(check, "check");
       if (check.success) {
-        // Swal.fire(
-        //   "Joined the Meeting successfully",
-        //   "Join Now!",
-        //   "success"
-        // ).then((result) => {
-        //   if (result.isConfirmed) {
-        //     setMeeting(check.success);
-        //     setDetailMeeting(check.data);
-        //     setUserID(check.userId);
-        //   }
-        // });
-        setMeeting(check.success);
         setDetailMeeting(check.data);
         setUserID(check.userId);
       } else {
@@ -57,21 +43,17 @@ export default function JoinMeeting() {
 
   return (
     <div>
-      {meeting && (
-        <MeetingLandingPage
-          detailMeeting={detailMeeting}
-          slug={slug}
-          userID={userID}
-          setMeeting={setMeeting}
-        />
-      )}
-      {/* {meetingVisibility && (
+      {meetingVisibility ? (
         <MeetingTemplate
           detailMeeting={detailMeeting}
           slug={slug}
           userID={userID}
         />
-      )} */}
+      ) : (
+        <MeetingLandingPage
+          setMeetingVisibility={setMeetingVisibility}
+        />
+      )}
     </div>
   );
 }

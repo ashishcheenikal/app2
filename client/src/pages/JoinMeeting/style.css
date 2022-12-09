@@ -724,9 +724,29 @@ body.dark .btn-close-right {
   font-size: 12px;
 }
 
-
 .chat-body {
   width: 100%;
 }
 
+/* Meeting Landing Page style */
 
+.selectWrap {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 2rem;
+}
+
+.select {
+  width: 350px;
+}
+
+.videoElement {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 10rem;
+}
+
+.btn.btn-primary.btnMPL {
+  height: 60px;
+  align-self: center;
+}
