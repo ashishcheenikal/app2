@@ -4,10 +4,14 @@ import LiveChat from "./LiveChat";
 import "./style.css";
 
 
-export default function MeetingTemplate({detailMeeting , slug , userID ,userName }) {
+export default function MeetingTemplate({detailMeeting , slug , userID ,userName, audioInput ,audioOutput ,video ,setAudioInput ,setAudioOutput ,setVideo}) {
 
   const [visibleChat, setVisibleChat] = useState(false);
-  
+  useEffect(() => {
+    console.log(audioInput, "audioInput MeetingTemplate");
+    console.log(audioOutput, "audioOutput MeetingTemplate");
+    console.log(video, "video MeetingTemplate");
+  }, [])
  
   return (
     <div>

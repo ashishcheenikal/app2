@@ -8,6 +8,9 @@ import MeetingTemplate from "./MeetingTemplate";
 export default function JoinMeeting() {
   const [meetingVisibility, setMeetingVisibility] = useState(false);
   const [detailMeeting, setDetailMeeting] = useState([]);
+  const [audioInput, setAudioInput] = useState([]);
+  const [audioOutput, setAudioOutput] = useState([]);
+  const [video, setVideo] = useState([]);
   const [userID, setUserID] = useState("");
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -39,6 +42,7 @@ export default function JoinMeeting() {
         });
       }
     });
+    
   }, []);
 
   return (
@@ -48,10 +52,22 @@ export default function JoinMeeting() {
           detailMeeting={detailMeeting}
           slug={slug}
           userID={userID}
+          audioInput={audioInput}
+          audioOutput={audioOutput}
+          video={video}
+          setAudioInput={setAudioInput}
+          setAudioOutput={setAudioOutput}
+          setVideo={setVideo}
         />
       ) : (
         <MeetingLandingPage
           setMeetingVisibility={setMeetingVisibility}
+          audioInput={audioInput}
+          audioOutput={audioOutput}
+          video={video}
+          setAudioInput={setAudioInput}
+          setAudioOutput={setAudioOutput}
+          setVideo={setVideo}
         />
       )}
     </div>

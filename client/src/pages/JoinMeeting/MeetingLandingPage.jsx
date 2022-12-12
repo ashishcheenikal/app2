@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import Swal from "sweetalert2";
 
-export default function MeetingLandingPage({ setMeetingVisibility }) {
+export default function MeetingLandingPage({
+  setMeetingVisibility,
+  audioInput,
+  audioOutput,
+  video,
+  setAudioInput,
+  setAudioOutput,
+  setVideo,
+}) {
   const videoRef = useRef(null);
   const [audioInputSelect, setAudioInputSelect] = useState([]);
   const [audioOutputSelect, setAudioOutputSelect] = useState([]);
   const [videoSelect, setVideoSelect] = useState([]);
-  const [audioInput, setAudioInput] = useState([]);
-  const [audioOutput, setAudioOutput] = useState([]);
-  const [video, setVideo] = useState([]);
 
   function gotDevices(deviceInfos) {
     console.log(deviceInfos, "deviceInfos");
@@ -157,7 +162,26 @@ export default function MeetingLandingPage({ setMeetingVisibility }) {
           }, 10000);
         }
       });
-    }
+    } 
+  };
+
+  const muteAudio = () => {
+    console.log("muteAudio");
+    window.stream.getTracks().forEach((track) => {
+      if (track.kind == "audio") {
+        track.enabled = !track.enabled;
+        console.log(track.enabled,"track.enabled audio")
+      }
+    });
+  };
+  const muteCamera = () => {
+    console.log("muteCamera");
+    window.stream.getTracks().forEach((track) => {
+      if (track.kind == "video") {
+        track.enabled = !track.enabled;
+        console.log(track.enabled,"track.enabled video")
+      }
+    });
   };
 
   return (
@@ -188,6 +212,10 @@ export default function MeetingLandingPage({ setMeetingVisibility }) {
       </div>
       <div className="videoElement">
         <video ref={videoRef} playsInline autoPlay />
+        <div className="muteBtn">
+          <button className="btn-mute" onClick={muteAudio}></button>
+          <button className="btn-camera" onClick={muteCamera}></button>
+        </div>
         <button className="btn btn-primary btnMPL" onClick={joinAction}>
           Join Meeting
         </button>
