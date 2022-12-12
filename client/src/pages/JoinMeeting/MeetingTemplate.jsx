@@ -1,18 +1,140 @@
-import {useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 import LiveChat from "./LiveChat";
 import "./style.css";
 
-
-export default function MeetingTemplate({detailMeeting , slug , userID ,userName, audioInput ,audioOutput ,video ,setAudioInput ,setAudioOutput ,setVideo}) {
-
+export default function MeetingTemplate({
+  detailMeeting,
+  slug,
+  userID,
+  userName,
+  audioInput,
+  audioOutput,
+  video,
+  setAudioInput,
+  setAudioOutput,
+  setVideo,
+  setMuteAudio,
+  setMuteCamera,
+  muteAudio,
+  muteCamera,
+}) {
   const [visibleChat, setVisibleChat] = useState(false);
+
+  const videoRef = useRef(null);
+
+  function gotStream(stream) {
+    window.stream = stream;
+    videoRef.current.srcObject = window.stream;
+  }
+
+  function handleError(error) {
+    console.log(
+      "navigator.MediaDevices.getUserMedia error: ",
+      error.message,
+      error.name
+    );
+    if (error.name == "NotAllowedError") {
+      Swal.fire(
+        "Camera or Microphone Permission denied!",
+        "Please change the settings!",
+        "error"
+      ).then((result) => {
+        if (result.isConfirmed) {
+          setTimeout(() => {
+            start();
+          }, 5000);
+        }
+      });
+    } else {
+      Swal.fire(`${error.message}!`, `${error.name}`, "error");
+    }
+  }
+
+  function start() {
+    if (window.stream) {
+      window.stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    const audioSource = audioInput[0]?.value;
+    const videoSource = video[0]?.value;
+    const constraints = {
+      audio: { exact: audioSource, echoCancellation: true },
+      video: {
+        exact: videoSource,
+        width: { exact: 1280 },
+        height: { exact: 720 },
+      },
+    };
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then(gotStream)
+      .catch(handleError);
+  }
   useEffect(() => {
+    start();
+     window.stream.getTracks().forEach((track) => {
+      if (track.kind == "audio") {
+        console.log(muteAudio,"muteAudio")
+        console.log(track.enabled, "track.enabled audio MeetingTemplate")
+        track.enabled = muteAudio;
+      }
+      if (track.kind == "video") {
+        console.log(muteCamera,"muteCamera")
+         console.log(track.enabled, "track.enabled video MeetingTemplate")
+        track.enabled = muteCamera;
+      }
+    });
     console.log(audioInput, "audioInput MeetingTemplate");
     console.log(audioOutput, "audioOutput MeetingTemplate");
     console.log(video, "video MeetingTemplate");
-  }, [])
- 
+  }, []);
+
+  const muteAudioFn = () => {
+    console.log("muteAudio");
+    window.stream.getTracks().forEach((track) => {
+      if (track.kind == "audio") {
+        track.enabled = !track.enabled;
+        // setMuteAudio(track.enabled)
+        console.log(track.enabled, "track.enabled audio");
+      }
+    });
+  };
+  const muteCameraFn = () => {
+    console.log("muteCamera");
+    window.stream.getTracks().forEach((track) => {
+      if (track.kind == "video") {
+        track.enabled = !track.enabled;
+        // setMuteCamera(track.enabled)
+        console.log(track.enabled, "track.enabled video");
+      }
+    });
+  };
+////////////////////Screen Sharing////////////////////
+
+function handleSuccess(stream) {
+  window.stream = stream;
+  videoRef.current.srcObject = window.stream;
+  // demonstrates how to detect that the user has stopped
+  // sharing the screen via the browser UI.
+  // stream.getVideoTracks()[0].addEventListener('ended', () => {
+  //   console.log('The user has ended sharing the screen');
+  // });
+}
+
+
+  const screenCapturing = () => {
+    const options = {audio: false, video: true, cursor: true};
+  // const displaySurface = 
+  // if (displaySurface !== 'default') {
+  //   options.video = {displaySurface};
+  // }
+  navigator.mediaDevices.getDisplayMedia(options)
+      .then(handleSuccess, handleError);
+  };
+
   return (
     <div>
       <div className="app-container">
@@ -63,23 +185,26 @@ export default function MeetingTemplate({detailMeeting , slug , userID ,userName
         </div>
         <div className="app-main">
           <div className="video-call-wrapper">
-            {/* <!-- Video Participant 1 --> */}
-            <div className="video-participant">
-              <div className="participant-action">
-                <button className="btn-mute"></button>
-                <button className="btn-camera"></button>
-              </div>
-              <button className="name-tag">Andy Will</button>
-              <img
-                src="https://images.unsplash.com/photo-1566821582776-92b13ab46bb4?ixlib=rb-1.2.1&auto=format&fit=crop&w=900&q=60"
-                alt="participant"
-              />
-            </div>
+            <video
+              ref={videoRef}
+              playsInline
+              autoPlay
+            />
           </div>
 
           <div className="video-call-actions">
-            <button className="video-action-button mic"></button>
-            <button className="video-action-button camera"></button>
+            <button
+              className="video-action-button mic"
+              onClick={muteAudioFn}
+            ></button>
+            <button
+              className="video-action-button camera"
+              onClick={muteCameraFn}
+            ></button>
+            <button
+              className="video-action-button screenCapturing"
+              onClick={screenCapturing}
+            ></button>
             <button className="video-action-button endcall">Leave</button>
           </div>
         </div>
@@ -106,9 +231,14 @@ export default function MeetingTemplate({detailMeeting , slug , userID ,userName
             </svg>
             {/* <!-- Close Icon --> */}
           </button>
-          <div className="chat-header">
-          </div>
-          {visibleChat && <LiveChat detailMeeting={detailMeeting} slug={slug} userID={userID} />}
+          <div className="chat-header"></div>
+          {visibleChat && (
+            <LiveChat
+              detailMeeting={detailMeeting}
+              slug={slug}
+              userID={userID}
+            />
+          )}
         </div>
         <button className="expand-btn">
           {/* <!-- expand icon --> */}

@@ -10,6 +10,10 @@ export default function MeetingLandingPage({
   setAudioInput,
   setAudioOutput,
   setVideo,
+  setMuteAudio,
+  setMuteCamera,
+  muteAudio,
+  muteCamera
 }) {
   const videoRef = useRef(null);
   const [audioInputSelect, setAudioInputSelect] = useState([]);
@@ -101,13 +105,13 @@ export default function MeetingLandingPage({
   function start() {
     if (window.stream) {
       window.stream.getTracks().forEach((track) => {
-        track.stop();
+        track.stop(); 
       });
     }
     const audioSource = audioInput[0]?.value;
     const videoSource = video[0]?.value;
     const constraints = {
-      audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
+      audio: { deviceId: audioSource ? { exact: audioSource } : undefined , echoCancellation: true,},
       video: { deviceId: videoSource ? { exact: videoSource } : undefined },
     };
     navigator.mediaDevices
@@ -124,7 +128,7 @@ export default function MeetingLandingPage({
     setAudioInput([audioInputSelect[0]]);
     setAudioOutput([audioOutputSelect[0]]);
     setVideo([videoSelect[0]]);
-  }, [audioInputSelect]);
+  }, [audioInputSelect,audioOutputSelect,videoSelect]);
 
   const handleInputAudio = (e) => {
     setAudioInput([e]);
@@ -163,22 +167,24 @@ export default function MeetingLandingPage({
         }
       });
     } 
-  };
+  }; 
 
-  const muteAudio = () => {
+  const muteAudioFn = () => {
     console.log("muteAudio");
     window.stream.getTracks().forEach((track) => {
       if (track.kind == "audio") {
         track.enabled = !track.enabled;
+        setMuteAudio((prev)=>!prev)
         console.log(track.enabled,"track.enabled audio")
       }
     });
   };
-  const muteCamera = () => {
+  const muteCameraFn = () => {
     console.log("muteCamera");
     window.stream.getTracks().forEach((track) => {
       if (track.kind == "video") {
         track.enabled = !track.enabled;
+        setMuteCamera((prev)=>!prev)
         console.log(track.enabled,"track.enabled video")
       }
     });
@@ -213,8 +219,8 @@ export default function MeetingLandingPage({
       <div className="videoElement">
         <video ref={videoRef} playsInline autoPlay />
         <div className="muteBtn">
-          <button className="btn-mute" onClick={muteAudio}></button>
-          <button className="btn-camera" onClick={muteCamera}></button>
+          <button className="btn-mute" onClick={muteAudioFn}></button>
+          <button className="btn-camera" onClick={muteCameraFn}></button>
         </div>
         <button className="btn btn-primary btnMPL" onClick={joinAction}>
           Join Meeting

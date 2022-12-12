@@ -12,6 +12,8 @@ export default function JoinMeeting() {
   const [audioOutput, setAudioOutput] = useState([]);
   const [video, setVideo] = useState([]);
   const [userID, setUserID] = useState("");
+  const [muteAudio, setMuteAudio] = useState(true);
+  const [muteCamera, setMuteCamera] = useState(true);
   const navigate = useNavigate();
   const { slug } = useParams();
   const meetingDetails = () => {
@@ -42,7 +44,6 @@ export default function JoinMeeting() {
         });
       }
     });
-    
   }, []);
 
   return (
@@ -58,6 +59,10 @@ export default function JoinMeeting() {
           setAudioInput={setAudioInput}
           setAudioOutput={setAudioOutput}
           setVideo={setVideo}
+          muteAudio={muteAudio}
+          setMuteAudio={setMuteAudio}
+          muteCamera={muteCamera}
+          setMuteCamera={setMuteCamera}
         />
       ) : (
         <MeetingLandingPage
@@ -68,6 +73,10 @@ export default function JoinMeeting() {
           setAudioInput={setAudioInput}
           setAudioOutput={setAudioOutput}
           setVideo={setVideo}
+          muteAudio={muteAudio}
+          setMuteAudio={setMuteAudio}
+          muteCamera={muteCamera}
+          setMuteCamera={setMuteCamera}
         />
       )}
     </div>
