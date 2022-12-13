@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import LiveChat from "./LiveChat";
 import "./style.css";
@@ -21,7 +21,7 @@ export default function MeetingTemplate({
   muteCamera,
 }) {
   const [visibleChat, setVisibleChat] = useState(false);
-
+  const navigate = useNavigate();
   const videoRef = useRef(null);
 
   function gotStream(stream) {
@@ -35,7 +35,7 @@ export default function MeetingTemplate({
       error.message,
       error.name
     );
-    if (error.name == "NotAllowedError") {
+    if (error.name === "NotAllowedError") {
       Swal.fire(
         "Camera or Microphone Permission denied!",
         "Please change the settings!",
@@ -75,15 +75,15 @@ export default function MeetingTemplate({
   }
   useEffect(() => {
     start();
-     window.stream.getTracks().forEach((track) => {
-      if (track.kind == "audio") {
-        console.log(muteAudio,"muteAudio")
-        console.log(track.enabled, "track.enabled audio MeetingTemplate")
+    window.stream.getTracks().forEach((track) => {
+      if (track.kind === "audio") {
+        console.log(muteAudio, "muteAudio");
+        console.log(track.enabled, "track.enabled audio MeetingTemplate");
         track.enabled = muteAudio;
       }
-      if (track.kind == "video") {
-        console.log(muteCamera,"muteCamera")
-         console.log(track.enabled, "track.enabled video MeetingTemplate")
+      if (track.kind === "video") {
+        console.log(muteCamera, "muteCamera");
+        console.log(track.enabled, "track.enabled video MeetingTemplate");
         track.enabled = muteCamera;
       }
     });
@@ -95,7 +95,7 @@ export default function MeetingTemplate({
   const muteAudioFn = () => {
     console.log("muteAudio");
     window.stream.getTracks().forEach((track) => {
-      if (track.kind == "audio") {
+      if (track.kind === "audio") {
         track.enabled = !track.enabled;
         // setMuteAudio(track.enabled)
         console.log(track.enabled, "track.enabled audio");
@@ -105,34 +105,40 @@ export default function MeetingTemplate({
   const muteCameraFn = () => {
     console.log("muteCamera");
     window.stream.getTracks().forEach((track) => {
-      if (track.kind == "video") {
+      if (track.kind === "video") {
         track.enabled = !track.enabled;
         // setMuteCamera(track.enabled)
         console.log(track.enabled, "track.enabled video");
       }
     });
   };
-////////////////////Screen Sharing////////////////////
+  ////////////////////Screen Sharing////////////////////
 
-function handleSuccess(stream) {
-  window.stream = stream;
-  videoRef.current.srcObject = window.stream;
-  // demonstrates how to detect that the user has stopped
-  // sharing the screen via the browser UI.
-  // stream.getVideoTracks()[0].addEventListener('ended', () => {
-  //   console.log('The user has ended sharing the screen');
-  // });
-}
-
+  function handleSuccess(stream) {
+    window.stream = stream;
+    videoRef.current.srcObject = window.stream;
+  }
 
   const screenCapturing = () => {
-    const options = {audio: false, video: true, cursor: true};
-  // const displaySurface = 
-  // if (displaySurface !== 'default') {
-  //   options.video = {displaySurface};
-  // }
-  navigator.mediaDevices.getDisplayMedia(options)
+    const options = { audio: false, video: true, cursor: true };
+    navigator.mediaDevices
+      .getDisplayMedia(options)
       .then(handleSuccess, handleError);
+  };
+
+  const leaveMeet = () => {
+    if (window.stream) {
+      window.stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+      Swal.fire("Thank You !", "Go Back to Home Page ...", "Success").then(
+        (result) => {
+          if (result.isConfirmed) {
+            navigate("/");
+          }
+        }
+      );
+    }
   };
 
   return (
@@ -186,6 +192,7 @@ function handleSuccess(stream) {
         <div className="app-main">
           <div className="video-call-wrapper">
             <video
+              className="video-call-wrapper"
               ref={videoRef}
               playsInline
               autoPlay
@@ -205,7 +212,9 @@ function handleSuccess(stream) {
               className="video-action-button screenCapturing"
               onClick={screenCapturing}
             ></button>
-            <button className="video-action-button endcall">Leave</button>
+            <button className="video-action-button endcall" onClick={leaveMeet}>
+              Leave
+            </button>
           </div>
         </div>
 

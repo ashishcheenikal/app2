@@ -755,3 +755,8 @@ body.dark .btn-close-right {
   height: 60px;
   align-self: center;
 }
+
+.videoSrc{
+  width: 500px;
+  height: 500px;
+}

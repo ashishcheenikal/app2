@@ -13,7 +13,7 @@ export default function MeetingLandingPage({
   setMuteAudio,
   setMuteCamera,
   muteAudio,
-  muteCamera
+  muteCamera,
 }) {
   const videoRef = useRef(null);
   const [audioInputSelect, setAudioInputSelect] = useState([]);
@@ -21,7 +21,7 @@ export default function MeetingLandingPage({
   const [videoSelect, setVideoSelect] = useState([]);
 
   function gotDevices(deviceInfos) {
-    console.log(deviceInfos, "deviceInfos");
+    // console.log(deviceInfos, "deviceInfos");
     deviceInfos?.map((select) => {
       if (select.kind === "audioinput") {
         const options = {
@@ -71,10 +71,11 @@ export default function MeetingLandingPage({
     const videoElement = videoRef.current;
     attachSinkId(videoElement, audioDestination);
   };
+
   function gotStream(stream) {
     window.stream = stream;
-    console.log(window.stream.getTracks(), "getTracks");
-    console.log(window.stream, "window.stream");
+    // console.log(window.stream.getTracks(), "getTracks");
+    // console.log(window.stream, "window.stream");
     videoRef.current.srcObject = window.stream;
     return navigator.mediaDevices.enumerateDevices();
   }
@@ -85,7 +86,7 @@ export default function MeetingLandingPage({
       error.message,
       error.name
     );
-    if (error.name == "NotAllowedError") {
+    if (error.name === "NotAllowedError") {
       Swal.fire(
         "Camera or Microphone Permission denied!",
         "Please change the settings!",
@@ -105,13 +106,17 @@ export default function MeetingLandingPage({
   function start() {
     if (window.stream) {
       window.stream.getTracks().forEach((track) => {
-        track.stop(); 
+        track.stop();
       });
     }
+    console.log(audioInput, video, "audio and video start");
     const audioSource = audioInput[0]?.value;
     const videoSource = video[0]?.value;
     const constraints = {
-      audio: { deviceId: audioSource ? { exact: audioSource } : undefined , echoCancellation: true,},
+      audio: {
+        deviceId: audioSource ? { exact: audioSource } : undefined,
+        echoCancellation: true,
+      },
       video: { deviceId: videoSource ? { exact: videoSource } : undefined },
     };
     navigator.mediaDevices
@@ -120,26 +125,30 @@ export default function MeetingLandingPage({
       .then(gotDevices)
       .catch(handleError);
   }
+
   useEffect(() => {
     start();
   }, []);
 
-  useEffect(() => {
-    setAudioInput([audioInputSelect[0]]);
-    setAudioOutput([audioOutputSelect[0]]);
-    setVideo([videoSelect[0]]);
-  }, [audioInputSelect,audioOutputSelect,videoSelect]);
+  // useEffect(() => {
+  //   setAudioInput([audioInputSelect[0]]);
+  //   setAudioOutput([audioOutputSelect[0]]);
+  //   setVideo([videoSelect[0]]);
+  // }, [audioInputSelect, audioOutputSelect, videoSelect]);
 
   const handleInputAudio = (e) => {
     setAudioInput([e]);
   };
+
   const handleOutputAudio = (e) => {
     setAudioOutput([e]);
     changeAudioDestination(e);
   };
+
   const handleVideo = (e) => {
     setVideo([e]);
   };
+
   useEffect(() => {
     console.log(audioInput, "audioInput");
     console.log(audioOutput, "audioOutput");
@@ -166,26 +175,26 @@ export default function MeetingLandingPage({
           }, 10000);
         }
       });
-    } 
-  }; 
+    }
+  };
 
   const muteAudioFn = () => {
     console.log("muteAudio");
     window.stream.getTracks().forEach((track) => {
-      if (track.kind == "audio") {
+      if (track.kind === "audio") {
         track.enabled = !track.enabled;
-        setMuteAudio((prev)=>!prev)
-        console.log(track.enabled,"track.enabled audio")
+        setMuteAudio((prev) => !prev);
+        console.log(track.enabled, "track.enabled audio");
       }
     });
   };
   const muteCameraFn = () => {
     console.log("muteCamera");
     window.stream.getTracks().forEach((track) => {
-      if (track.kind == "video") {
+      if (track.kind === "video") {
         track.enabled = !track.enabled;
-        setMuteCamera((prev)=>!prev)
-        console.log(track.enabled,"track.enabled video")
+        setMuteCamera((prev) => !prev);
+        console.log(track.enabled, "track.enabled video");
       }
     });
   };
