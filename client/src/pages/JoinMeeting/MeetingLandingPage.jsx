@@ -16,12 +16,15 @@ export default function MeetingLandingPage({
   muteCamera,
 }) {
   const videoRef = useRef(null);
+  const volumeMeterEl = useRef(null);
   const [audioInputSelect, setAudioInputSelect] = useState([]);
   const [audioOutputSelect, setAudioOutputSelect] = useState([]);
   const [videoSelect, setVideoSelect] = useState([]);
 
   function gotDevices(deviceInfos) {
-    // console.log(deviceInfos, "deviceInfos");
+    setAudioInputSelect([]);
+    setAudioOutputSelect([]);
+    setVideoSelect([]);
     deviceInfos?.map((select) => {
       if (select.kind === "audioinput") {
         const options = {
@@ -46,6 +49,14 @@ export default function MeetingLandingPage({
       }
     });
   }
+
+  const devicesList = () => {
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then()
+      .then(gotDevices)
+      .catch(handleError);
+  };
 
   function attachSinkId(element, sinkId) {
     if (typeof element.sinkId !== "undefined") {
@@ -72,14 +83,6 @@ export default function MeetingLandingPage({
     attachSinkId(videoElement, audioDestination);
   };
 
-  function gotStream(stream) {
-    window.stream = stream;
-    // console.log(window.stream.getTracks(), "getTracks");
-    // console.log(window.stream, "window.stream");
-    videoRef.current.srcObject = window.stream;
-    return navigator.mediaDevices.enumerateDevices();
-  }
-
   function handleError(error) {
     console.log(
       "navigator.MediaDevices.getUserMedia error: ",
@@ -103,6 +106,28 @@ export default function MeetingLandingPage({
     }
   }
 
+  function gotStream(stream) {
+    window.stream = stream;
+    videoRef.current.srcObject = window.stream;
+    console.log( window.stream," window.stream 777777777777777")
+    const audioContext = new AudioContext();
+    const mediaStreamAudioSourceNode =
+      audioContext.createMediaStreamSource(stream);
+    const analyserNode = audioContext.createAnalyser();
+    mediaStreamAudioSourceNode.connect(analyserNode);
+    const pcmData = new Float32Array(analyserNode.fftSize);
+    const onFrame = () => {
+      analyserNode.getFloatTimeDomainData(pcmData);
+      let sumSquares = 0.0;
+      for (const amplitude of pcmData) {
+        sumSquares += amplitude * amplitude;
+      }
+      volumeMeterEl.current.value = Math.sqrt(sumSquares / pcmData.length);
+      window.requestAnimationFrame(onFrame);
+    };
+    window.requestAnimationFrame(onFrame);
+  }
+
   function start() {
     if (window.stream) {
       window.stream.getTracks().forEach((track) => {
@@ -122,19 +147,14 @@ export default function MeetingLandingPage({
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then(gotStream)
-      .then(gotDevices)
       .catch(handleError);
   }
 
   useEffect(() => {
     start();
+    devicesList();
+    console.log("first");
   }, []);
-
-  // useEffect(() => {
-  //   setAudioInput([audioInputSelect[0]]);
-  //   setAudioOutput([audioOutputSelect[0]]);
-  //   setVideo([videoSelect[0]]);
-  // }, [audioInputSelect, audioOutputSelect, videoSelect]);
 
   const handleInputAudio = (e) => {
     setAudioInput([e]);
@@ -153,16 +173,12 @@ export default function MeetingLandingPage({
     console.log(audioInput, "audioInput");
     console.log(audioOutput, "audioOutput");
     console.log(video, "video");
+    start();
   }, [audioInput, audioOutput, video]);
 
   const joinAction = () => {
     if (audioInput.length && audioOutput.length && video.length !== 0) {
       setMeetingVisibility((prev) => !prev);
-      if (window.stream) {
-        window.stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      }
     } else {
       Swal.fire(
         "Please select any devices for Audio and Video!",
@@ -227,6 +243,9 @@ export default function MeetingLandingPage({
       </div>
       <div className="videoElement">
         <video ref={videoRef} playsInline autoPlay />
+
+        <meter ref={volumeMeterEl} high="0.25" max="1" value="0"></meter>
+
         <div className="muteBtn">
           <button className="btn-mute" onClick={muteAudioFn}></button>
           <button className="btn-camera" onClick={muteCameraFn}></button>

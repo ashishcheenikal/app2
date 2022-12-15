@@ -24,11 +24,6 @@ export default function MeetingTemplate({
   const navigate = useNavigate();
   const videoRef = useRef(null);
 
-  function gotStream(stream) {
-    window.stream = stream;
-    videoRef.current.srcObject = window.stream;
-  }
-
   function handleError(error) {
     console.log(
       "navigator.MediaDevices.getUserMedia error: ",
@@ -43,7 +38,7 @@ export default function MeetingTemplate({
       ).then((result) => {
         if (result.isConfirmed) {
           setTimeout(() => {
-            start();
+            // start();
           }, 5000);
         }
       });
@@ -52,44 +47,14 @@ export default function MeetingTemplate({
     }
   }
 
-  function start() {
-    if (window.stream) {
-      window.stream.getTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-    const audioSource = audioInput[0]?.value;
-    const videoSource = video[0]?.value;
-    const constraints = {
-      audio: { exact: audioSource, echoCancellation: true },
-      video: {
-        exact: videoSource,
-        width: { exact: 1280 },
-        height: { exact: 720 },
-      },
-    };
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then(gotStream)
-      .catch(handleError);
-  }
   useEffect(() => {
-    start();
-    window.stream.getTracks().forEach((track) => {
-      if (track.kind === "audio") {
-        console.log(muteAudio, "muteAudio");
-        console.log(track.enabled, "track.enabled audio MeetingTemplate");
-        track.enabled = muteAudio;
-      }
-      if (track.kind === "video") {
-        console.log(muteCamera, "muteCamera");
-        console.log(track.enabled, "track.enabled video MeetingTemplate");
-        track.enabled = muteCamera;
-      }
-    });
+    videoRef.current.srcObject = window.stream;
+    console.log(window.stream, " window.stream 66666666");
     console.log(audioInput, "audioInput MeetingTemplate");
     console.log(audioOutput, "audioOutput MeetingTemplate");
     console.log(video, "video MeetingTemplate");
+    console.log(muteAudio, "muteAudio MeetingTemplate");
+    console.log(muteCamera, "muteCamera MeetingTemplate");
   }, []);
 
   const muteAudioFn = () => {
@@ -97,7 +62,7 @@ export default function MeetingTemplate({
     window.stream.getTracks().forEach((track) => {
       if (track.kind === "audio") {
         track.enabled = !track.enabled;
-        // setMuteAudio(track.enabled)
+        setMuteAudio(track.enabled);
         console.log(track.enabled, "track.enabled audio");
       }
     });
@@ -107,7 +72,7 @@ export default function MeetingTemplate({
     window.stream.getTracks().forEach((track) => {
       if (track.kind === "video") {
         track.enabled = !track.enabled;
-        // setMuteCamera(track.enabled)
+        setMuteCamera(track.enabled);
         console.log(track.enabled, "track.enabled video");
       }
     });
@@ -117,6 +82,13 @@ export default function MeetingTemplate({
   function handleSuccess(stream) {
     window.stream = stream;
     videoRef.current.srcObject = window.stream;
+    if (stream.getVideoTracks()) {
+      stream.getVideoTracks().map((track) => {
+        track.onended = (event) => {
+          videoRef.current.srcObject = window.stream;
+        };
+      });
+    }
   }
 
   const screenCapturing = () => {
