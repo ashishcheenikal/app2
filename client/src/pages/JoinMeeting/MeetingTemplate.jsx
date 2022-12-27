@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -22,7 +23,223 @@ export default function MeetingTemplate({
 }) {
   const [visibleChat, setVisibleChat] = useState(false);
   const navigate = useNavigate();
-  const videoRef = useRef(null);
+  // const [muteCam, setMuteCam] = useState(false);
+  // const [muteAud, setMuteAud] = useState(false);
+  const videoRef = useRef(null); // for Rendering Self video
+  const videoRef2 = useRef(null); // for Rendering Mixed video
+  const [conference, setConference] = useState(
+    new window.Owt.Conference.ConferenceClient()
+  ); // conference state
+  const [remoteStream, setRemoteStream] = useState([]); // for getting remote streams details (rendering remote streams as separate videos)
+  const [publicationGlobal, setPublicationGlobal] = useState({})
+
+  let localStream;
+  let myId;
+  let myRoom;
+  let subscribeForward = false;
+  let isSelf = false;
+  // let publicationGlobal;
+
+  //////////////////////////////// Intel® Collaboration Suite for WebRTC version 5.0 ///////////////////////////////////////////////////
+
+  const room = "63a3f13e106dea69e54af02d";
+
+  const mixStream = async (room, ID, view) => {
+    let jsonPatch = [
+      {
+        op: "add",
+        path: "/info/inViews",
+        value: view,
+      },
+    ];
+    await axios.patch(
+      `https://mcu.spjain.org:3004/rooms/${room}/streams/${ID}`,
+      jsonPatch
+    );
+  };
+
+  const streamEnd = (id) => {
+    const remainingStreams = remoteStream.filter((val) => {
+      if (val.id !== id) {
+        return val;
+      }
+    });
+    setRemoteStream(remainingStreams);
+  };
+
+  const subscribeAndRenderVideo = (stream, from) => {
+    console.log(from, "+-+-+-+-+-+-+-+-+-+-+-+");
+    conference.subscribe(stream).then(
+      (subscription) => {
+        videoRef2.current.srcObject = stream.mediaStream;
+        setRemoteStream((list) => [...list, stream]);
+      },
+      (err) => {
+        console.log("subscribe failed", err);
+      }
+    );
+    stream.addEventListener("ended", () => {
+      // stream.id.stop();
+      console.log(remoteStream, "remoteStreamremoteStreamremoteStream");
+      streamEnd(stream.id);
+    });
+  };
+
+  conference.addEventListener("streamadded", (event) => {
+    console.log("A new stream is added ", event.stream.id);
+    console.log(event, "event 55555555");
+    isSelf = isSelf ? isSelf : event.stream.id !== publicationGlobal.id;
+    isSelf && subscribeAndRenderVideo(event.stream, "FromEvent");
+
+    // mixStream(myRoom, event.stream.id, "common");
+
+    event.stream.addEventListener("ended", () => {
+      console.log(event.stream.id + " is ended.");
+    });
+  });
+
+  const createToken = async () => {
+    const res = await axios.post(`${process.env.REACT_APP_INTEL_URL}tokens/`, {
+      role: "presenter",
+      room: room,
+      user: "user",
+    });
+    return res.data;
+  };
+
+  const resFun = (response) => {
+    const token = response;
+    conference.join(token).then((resp) => {
+      console.log(resp, "resp147147");
+      myId = resp.self.id;
+      myRoom = resp.id;
+      console.log(myId, "myId");
+      console.log(myRoom, "myRoom");
+      isPublish(resp);
+    });
+  };
+
+  const isPublish = (resp) => {
+    let mediaStream;
+    let stream = window.stream;
+    console.log(stream, "stream that should be same");
+    let publishOption = {
+      audio: true,
+      video: true,
+    };
+    console.log(stream, "steam120120");
+    mediaStream = stream;
+    let obj = {
+      user: "AshishJoshy",
+    };
+    /// creating a local stream for publishing your video and audio streams
+    localStream = new window.Owt.Base.LocalStream(
+      mediaStream,
+      new window.Owt.Base.StreamSourceInfo("mic", "camera"),
+      obj
+    );
+
+    console.log(localStream, "localStream789789");
+
+    videoRef.current.srcObject = stream; /// rendering selfVideo from stream
+
+    /// publishing our stream by passing local video and publishOptions
+    conference.publish(localStream, publishOption).then((publication) => {
+      console.log(publication, "publication1231231232132");
+
+      // publicationGlobal = publication;
+
+      setPublicationGlobal(publication)
+
+      mixStream(myRoom, publication.id, "common");
+
+      publication.addEventListener("error", (err) => {
+        console.log("Publication error: " + err.error.message);
+      });
+    });
+
+    let streams = resp.remoteStreams;
+    console.log(resp.remoteStreams, "resp.remoteStreams");
+
+    for (const stream of streams) {
+      if (!subscribeForward) {
+        if (
+          stream.source.audio === "mixed" ||
+          stream.source.video === "mixed"
+        ) {
+          console.log(stream.mediaStream, "852852");
+          subscribeAndRenderVideo(stream); // subscribing the video from room (other participants video which are published earlier)
+        }
+      } else if (stream.source.audio !== "mixed") {
+        subscribeAndRenderVideo(stream, "fromRemoteResponse");
+      }
+    }
+    console.log("Streams in conference:", streams.length);
+    var participants = resp.participants;
+    console.log("Participants in conference: " + participants.length);
+  };
+
+  window.onbeforeunload = function (event) {
+    conference.leave();
+    publicationGlobal.stop();
+  };
+
+  //////////////////////////////// Intel® Collaboration Suite for WebRTC version 5.0  [END] ////////////////////////////////////////////
+
+  useEffect(() => {
+    videoRef.current.srcObject = window.stream;
+    console.log(window.stream, " window.stream 66666666");
+    console.log(audioInput, "audioInput MeetingTemplate");
+    console.log(audioOutput, "audioOutput MeetingTemplate");
+    console.log(video, "video MeetingTemplate");
+    console.log(muteAudio, "muteAudio MeetingTemplate");
+    console.log(muteCamera, "muteCamera MeetingTemplate");
+    createToken().then((res) => {
+      resFun(res);
+    });
+    console.log(conference, "conference963963");
+  }, []);
+
+  const muteAudioFn = () => {
+    console.log("muteAudio");
+    // window.stream.getTracks().forEach((track) => {
+    //   if (track.kind === "audio") {
+    //     track.enabled = !track.enabled;
+    //     setMuteAudio(track.enabled);
+    //     console.log(track.enabled, "track.enabled audio");
+    //   }
+    // });
+    if (muteAudio) {
+      publicationGlobal.unmute("audio");
+      setMuteAudio((prev) => !prev);
+      console.log("publicationGlobal.unmute()")
+    } else {
+      publicationGlobal.mute("audio");
+      setMuteAudio((prev) => !prev);
+      console.log("publicationGlobal.mute()")
+    }
+  };
+  const muteCameraFn = () => {
+    console.log("muteCamera", );
+    // window.stream.getTracks().forEach((track) => {
+    //   if (track.kind === "video") {
+    //     track.enabled = !track.enabled;
+    //     setMuteCamera(track.enabled);
+    //     console.log(track.enabled, "track.enabled video");
+    //   }
+    // });
+    if (muteCamera) {
+      publicationGlobal.unmute("video");
+      setMuteCamera((prev) => !prev);
+      console.log("publicationGlobal.unmute()")
+    } else {
+      publicationGlobal.mute("video");
+      setMuteCamera((prev) => !prev);
+      console.log("publicationGlobal.mute()")
+    }
+  };
+
+  ////////////////////Screen Sharing////////////////////
 
   function handleError(error) {
     console.log(
@@ -47,45 +264,16 @@ export default function MeetingTemplate({
     }
   }
 
-  useEffect(() => {
+  const restart = () => {
     videoRef.current.srcObject = window.stream;
-    console.log(window.stream, " window.stream 66666666");
-    console.log(audioInput, "audioInput MeetingTemplate");
-    console.log(audioOutput, "audioOutput MeetingTemplate");
-    console.log(video, "video MeetingTemplate");
-    console.log(muteAudio, "muteAudio MeetingTemplate");
-    console.log(muteCamera, "muteCamera MeetingTemplate");
-  }, []);
-
-  const muteAudioFn = () => {
-    console.log("muteAudio");
-    window.stream.getTracks().forEach((track) => {
-      if (track.kind === "audio") {
-        track.enabled = !track.enabled;
-        setMuteAudio(track.enabled);
-        console.log(track.enabled, "track.enabled audio");
-      }
-    });
   };
-  const muteCameraFn = () => {
-    console.log("muteCamera");
-    window.stream.getTracks().forEach((track) => {
-      if (track.kind === "video") {
-        track.enabled = !track.enabled;
-        setMuteCamera(track.enabled);
-        console.log(track.enabled, "track.enabled video");
-      }
-    });
-  };
-  ////////////////////Screen Sharing////////////////////
-
   function handleSuccess(stream) {
-    window.stream = stream;
-    videoRef.current.srcObject = window.stream;
+    videoRef.current.srcObject = stream;
     if (stream.getVideoTracks()) {
       stream.getVideoTracks().map((track) => {
         track.onended = (event) => {
-          videoRef.current.srcObject = window.stream;
+          console.log("first Ended");
+          restart();
         };
       });
     }
@@ -97,6 +285,8 @@ export default function MeetingTemplate({
       .getDisplayMedia(options)
       .then(handleSuccess, handleError);
   };
+
+  ////////////  LeaveMeeting /////////////////////
 
   const leaveMeet = () => {
     if (window.stream) {
@@ -163,12 +353,8 @@ export default function MeetingTemplate({
         </div>
         <div className="app-main">
           <div className="video-call-wrapper">
-            <video
-              className="video-call-wrapper"
-              ref={videoRef}
-              playsInline
-              autoPlay
-            />
+            <video className="videoTag" ref={videoRef} playsInline autoPlay />
+            <video className="videoTag" ref={videoRef2} playsInline autoPlay />
           </div>
 
           <div className="video-call-actions">

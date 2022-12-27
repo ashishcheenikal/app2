@@ -756,3 +756,6 @@ body.dark .btn-close-right {
   align-self: center;
 }
 
+.videoTag{
+  width: 40%;
+}
